@@ -1,0 +1,258 @@
+@import "tailwindcss";
+
+/*
+ * Paperica design tokens.
+ * Colours are sampled from the logo; `static` emits every token as a CSS variable
+ * (e.g. var(--color-chilli)) so SVGs and inline styles can use them too.
+ *
+ * Contrast (WCAG 2.1, checked on /styleguide):
+ *   chilli on white 6.48 · chilli on blush 4.72 · chilli on paper 5.95   → AA text
+ *   white on stem-deep 4.95                                              → AA text (badges)
+ *   stem, chilli-soft                                                    → large text / decoration only
+ *   taupe                                                                → decorative borders only
+ */
+@theme static {
+  --color-chilli: #c00000;
+  --color-chilli-deep: #8b0000;
+  --color-chilli-soft: #d96060;
+  --color-blush: #ffd1d1;
+  --color-stem: #769b2f;
+  --color-stem-deep: #5a7a22;
+  --color-paper: #fdf5dc;
+  --color-taupe: #d4cab5;
+  --color-ink: #2b1a1a;
+  --color-ink-muted: #6b5656;
+  --color-white: #ffffff;
+  --color-tint-blue: #e4eef6; /* optional product-tile tint, only when photos suit it */
+  --color-scribble: rgb(255 90 90 / 0.5);
+
+  /* Storefront mood (pink & cream "paper happiness" look) */
+  --color-cream: #fdf3e9; /* page background between pink bands */
+  --color-petal: #fbb9bb; /* tile pastels for collections, cards, stickers */
+  --color-butter: #ffe1a3;
+  --color-lilac: #e8d5eb;
+  --color-sage: #dfe4c2;
+  --color-peach: #fbccc4;
+}
+
+/* Font variables come from next/font in app/layout.tsx. */
+@theme inline {
+  --font-display: var(--font-marcellus-sc), ui-serif, Georgia, serif; /* wordmark-style titles */
+  --font-serif: var(--font-caslon), ui-serif, Georgia, serif;         /* section headings */
+  --font-headline: var(--font-fraunces), ui-serif, Georgia, serif;    /* hero headlines */
+  --font-script: var(--font-sacramento), cursive;                      /* handwritten accents */
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif; /* body + UI */
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-chilli);
+    outline-offset: 2px;
+  }
+
+  /* Lock page scroll while a modal dialog (drawer / modal) is open. */
+  html:has(dialog[open]:modal) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Wide letter-spaced label ("A L L  T H I N G S  P A P E R"). */
+@utility label-caps {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1.4;
+
+  @variant md {
+    font-size: 0.75rem; /* 12px */
+  }
+}
+
+/* Tighter tracking for button labels, which need to stay compact. */
+@utility label-button {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Rich text from the CMS (policies, product descriptions). */
+@utility prose-paperica {
+  line-height: 1.7;
+
+  & h2 {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    margin: 2rem 0 0.75rem;
+    color: var(--color-ink);
+  }
+  & h3 {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    margin: 1.5rem 0 0.5rem;
+  }
+  & p,
+  & ul,
+  & ol {
+    margin: 0 0 1rem;
+  }
+  & ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  & ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+  & a {
+    color: var(--color-chilli);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  & a:hover {
+    color: var(--color-chilli-deep);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Native <dialog> animations (Drawer slides from the right, Modal fades/scales).
+ * Uses @starting-style + allow-discrete; browsers without support simply skip the animation.
+ * ------------------------------------------------------------------------- */
+
+.pp-dialog {
+  transition:
+    translate 300ms ease,
+    opacity 300ms ease,
+    scale 300ms ease,
+    display 300ms allow-discrete,
+    overlay 300ms allow-discrete;
+}
+
+.pp-dialog::backdrop {
+  background-color: rgb(43 26 26 / 0);
+  transition:
+    background-color 300ms ease,
+    display 300ms allow-discrete,
+    overlay 300ms allow-discrete;
+}
+
+.pp-dialog[open]::backdrop {
+  background-color: rgb(43 26 26 / 0.5);
+}
+
+@starting-style {
+  .pp-dialog[open]::backdrop {
+    background-color: rgb(43 26 26 / 0);
+  }
+}
+
+.pp-drawer {
+  translate: 100% 0;
+}
+.pp-drawer[open] {
+  translate: 0 0;
+}
+@starting-style {
+  .pp-drawer[open] {
+    translate: 100% 0;
+  }
+}
+
+.pp-drawer-left {
+  translate: -100% 0;
+}
+.pp-drawer-left[open] {
+  translate: 0 0;
+}
+@starting-style {
+  .pp-drawer-left[open] {
+    translate: -100% 0;
+  }
+}
+
+/*
+ * Section entrance: subtle, fast fade-up driven by scroll position (no JavaScript).
+ * Browsers without scroll-driven animations simply show the section.
+ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: fade-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* Search sheet slides down from the top. */
+.pp-sheet {
+  translate: 0 -100%;
+}
+.pp-sheet[open] {
+  translate: 0 0;
+}
+@starting-style {
+  .pp-sheet[open] {
+    translate: 0 -100%;
+  }
+}
+
+/* Announcement bar marquee: two copies of the text, scrolled by half the track. */
+@keyframes marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+.pp-modal {
+  opacity: 0;
+  scale: 0.96;
+}
+.pp-modal[open] {
+  opacity: 1;
+  scale: 1;
+}
+@starting-style {
+  .pp-modal[open] {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+/* Lift the floating WhatsApp button above the product page's mobile sticky purchase bar. */
+.floating-wa {
+  transition: bottom 300ms ease;
+}
+body[data-sticky-buy="1"] .floating-wa {
+  bottom: 5.5rem;
+}

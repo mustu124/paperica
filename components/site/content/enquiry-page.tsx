@@ -1,0 +1,68 @@
+import { notFound } from "next/navigation";
+import { resolveSubcategory } from "@/lib/collections";
+import { renderTokens } from "@/lib/content";
+import { getCategoryTree } from "@/lib/data/categories";
+import { getPage } from "@/lib/data/pages";
+import { getCatalog, getProductCards } from "@/lib/data/products";
+import { getSiteSettings } from "@/lib/data/settings";
+import { titleCase } from "@/lib/format";
+import { EnquiryButtons } from "../enquiry-buttons";
+import { ProductGrid } from "../product-grid";
+import { ContentShell, Prose } from "./content-shell";
+
+/**
+ * Corporate Gifting / Custom Orders: page copy with a prominent WhatsApp enquiry CTA (+ email)
+ * above and below, then any products tagged to the matching content subcategory.
+ */
+export async function EnquiryPage({ slug }: { slug: string }) {
+  const [page, settings, tree, catalog] = await Promise.all([
+    getPage(slug),
+    getSiteSettings(),
+    getCategoryTree(),
+    getCatalog(),
+  ]);
+  if (!page) notFound();
+
+  // Products tagged to the content subcategory with the same slug (e.g. PERSONALISED → Corporate Gifting).
+  let productIds: string[] = [];
+  let parent: { name: string; href: string } | null = null;
+  for (const category of tree) {
+    const sub = category.subcategories.find((s) => s.slug === slug && s.kind === "content_page");
+    if (sub) {
+      parent = { name: category.name, href: category.href };
+      const ids = resolveSubcategory(sub, category, catalog);
+      productIds = catalog.products.filter((p) => ids.has(p.id)).map((p) => p.id);
+      break;
+    }
+  }
+  const products = await getProductCards(productIds);
+  const cta = {
+    settings,
+    label: page.cta_label,
+    whatsappMessage: page.cta_whatsapp_message,
+    emailSubject: page.cta_email_subject,
+  };
+
+  return (
+    <>
+      <ContentShell
+        title={page.title}
+        crumbs={[
+          { label: "Home", href: "/" },
+          ...(parent ? [{ label: titleCase(parent.name), href: parent.href }] : []),
+          { label: page.title },
+        ]}
+      >
+        <EnquiryButtons {...cta} className="mb-10" />
+        <Prose html={renderTokens(page.body_html, settings)} />
+        <EnquiryButtons {...cta} className="mt-10 border-t border-taupe pt-8" />
+      </ContentShell>
+
+      {products.length > 0 && (
+        <section aria-label="Products" className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-6">
+          <ProductGrid products={products} />
+        </section>
+      )}
+    </>
+  );
+}

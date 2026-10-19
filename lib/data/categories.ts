@@ -1,0 +1,76 @@
+import "server-only";
+import { cacheLife, cacheTag } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import type { SubcategoryKind } from "@/types/db";
+import { categoryHref, subcategoryHref } from "./menu";
+import { TAGS } from "./tags";
+
+export type CategoryNode = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  href: string;
+  subcategories: SubcategoryNode[];
+};
+
+export type SubcategoryNode = {
+  id: string;
+  categoryId: string;
+  name: string;
+  slug: string;
+  kind: SubcategoryKind;
+  description: string | null;
+  href: string;
+};
+
+/** Every category (including ones hidden from the menu) with its subcategories. */
+export async function getCategoryTree(): Promise<CategoryNode[]> {
+  "use cache";
+  cacheLife({ stale: 60, revalidate: 60, expire: 86400 });
+  cacheTag(TAGS.menu);
+
+  const supabase = createPublicClient();
+  const [cats, subs] = await Promise.all([
+    supabase.from("categories").select("id, name, slug, description, sort_order").order("sort_order"),
+    supabase
+      .from("subcategories")
+      .select("id, category_id, name, slug, kind, description, sort_order")
+      .order("sort_order"),
+  ]);
+  if (cats.error || subs.error) {
+    console.error("[categories] failed to load:", (cats.error ?? subs.error)?.message);
+    return [];
+  }
+
+  return cats.data.map((c) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    description: c.description,
+    href: categoryHref(c.slug),
+    subcategories: subs.data
+      .filter((s) => s.category_id === c.id)
+      .map((s) => ({
+        id: s.id,
+        categoryId: s.category_id,
+        name: s.name,
+        slug: s.slug,
+        kind: s.kind,
+        description: s.description,
+        href: subcategoryHref(c.slug, s),
+      })),
+  }));
+}
+
+/** Looks up a category and (optionally) one of its subcategories by slug. */
+export async function getCollectionNodes(categorySlug: string, subcategorySlug?: string) {
+  const tree = await getCategoryTree();
+  const category = tree.find((c) => c.slug === categorySlug);
+  if (!category) return null;
+  if (!subcategorySlug) return { category, subcategory: null };
+  const subcategory = category.subcategories.find((s) => s.slug === subcategorySlug);
+  // "view-all" as a path segment is the same page as the category root.
+  if (!subcategory || subcategory.kind === "view_all") return null;
+  return { category, subcategory };
+}
