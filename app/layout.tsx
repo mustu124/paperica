@@ -3,6 +3,7 @@ import { Fraunces, Jost, Marcellus_SC, Sacramento } from "next/font/google";
 import localFont from "next/font/local";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
+import { siteUrl } from "@/lib/site-url";
 
 // Flared small-caps serif for wordmark-style titles (closest match to the logo).
 const display = Marcellus_SC({
@@ -39,7 +40,7 @@ const sans = Jost({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl()),
   title: { default: "Paperica", template: "%s | Paperica" },
 };
 

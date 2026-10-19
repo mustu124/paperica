@@ -2,8 +2,9 @@ import type { MetadataRoute } from "next";
 import { getCategoryTree } from "@/lib/data/categories";
 import { getAllPages } from "@/lib/data/pages";
 import { getCatalog } from "@/lib/data/products";
+import { siteUrl } from "@/lib/site-url";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+const SITE = siteUrl();
 
 // CMS pages that have their own top-level route (slug → path).
 const PAGE_ROUTES: Record<string, string> = {

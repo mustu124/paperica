@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { siteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
 const loginSchema = z.object({
@@ -60,7 +61,7 @@ export async function requestPasswordReset(email: string): Promise<{ message: st
   if (!parsed.success) return { message: "Enter the email you sign in with." };
   if (!(await rateLimit(await headers(), "password-reset", 3, 900))) return { message };
 
-  const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+  const site = siteUrl();
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${site}/admin/auth/callback?next=/admin/account/password`,

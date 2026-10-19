@@ -19,10 +19,11 @@ import { NO_MATCH_PARAM, withFallback } from "@/lib/static-params";
 import { getSiteSettings } from "@/lib/data/settings";
 import { titleCase } from "@/lib/format";
 import { settingNumber, settingString } from "@/lib/settings";
+import { siteUrl } from "@/lib/site-url";
 
 type Props = PageProps<"/products/[slug]">;
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+const SITE_URL = siteUrl();
 
 export async function generateStaticParams() {
   const { products } = await getCatalog();
