@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Carousel } from "@/components/ui/carousel";
 import { renderTokensText } from "@/lib/content";
 import type { HomepageSection } from "@/lib/data/homepage";
+import { ArtImage } from "@/components/ui/art-image";
 import { BUNDLED_ROUND_LOGO, settingString, type SiteSettings } from "@/lib/settings";
 import { configString, groupSlots } from "./slots";
 
@@ -50,11 +51,12 @@ export function InstagramFeed({ section, settings }: { section: HomepageSection;
       <Carousel label="Instagram posts" slideClassName="basis-1/2 md:basis-1/4">
         {tiles.map((t) => {
           const img = (
-            <Image
+            <ArtImage
               src={t.images[0].url}
+              mobileSrc={t.images[0].mobileUrl}
               alt={t.images[0].alt}
-              fill
               sizes="(min-width: 768px) 25vw, 50vw"
+              mobileSizes="50vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           );

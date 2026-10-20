@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { ArtImage } from "@/components/ui/art-image";
 import { Carousel } from "@/components/ui/carousel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { HomepageSection } from "@/lib/data/homepage";
@@ -8,7 +8,7 @@ import type { MenuCategory } from "@/lib/data/menu";
 import { cn } from "@/lib/cn";
 import { configString, groupSlots } from "./slots";
 
-type Tile = { key: string; href: string; caption: string; line: string; image: string | null; alt: string };
+type Tile = { key: string; href: string; caption: string; line: string; image: string | null; mobileImage: string | null; alt: string };
 
 // Pastel "blob" behind each tile, cycling like the mood board.
 const TONES = ["bg-petal", "bg-butter", "bg-lilac", "bg-sage", "bg-peach", "bg-blush"];
@@ -39,13 +39,14 @@ export function CollectionCarousel({
       caption: s.primary.heading ?? "",
       line: s.primary.subheading ?? "",
       image: s.images[0]?.url ?? null,
+      mobileImage: s.images[0]?.mobileUrl ?? null,
       // The visible caption names the link, so the image is decorative unless the caption is empty.
       alt: s.primary.heading ? "" : (s.images[0]?.alt ?? ""),
     }));
   const tiles: Tile[] =
     fromAssets.length > 0
       ? fromAssets
-      : menu.map((c) => ({ key: c.id, href: c.href, caption: c.name, line: "", image: c.image, alt: "" }));
+      : menu.map((c) => ({ key: c.id, href: c.href, caption: c.name, line: "", image: c.image, mobileImage: null, alt: "" }));
   if (tiles.length === 0) return null;
 
   const heading = configString(section.config, "heading");
@@ -59,11 +60,12 @@ export function CollectionCarousel({
           <Link key={t.key} href={t.href} className="group block">
             <div className={cn("relative aspect-square overflow-hidden transition-transform duration-500 group-hover:-rotate-2", TONES[i % TONES.length], BLOBS[i % BLOBS.length])}>
               {t.image && (
-                <Image
+                <ArtImage
                   src={t.image}
+                  mobileSrc={t.mobileImage}
                   alt={t.alt}
-                  fill
                   sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw"
+                  mobileSizes="50vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               )}

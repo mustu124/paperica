@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { renderTokensText } from "@/lib/content";
 import type { HomepageSection } from "@/lib/data/homepage";
 import type { ProductCardData } from "@/lib/data/products";
 import type { SiteSettings } from "@/lib/settings";
+import { ArtImage } from "@/components/ui/art-image";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ProductCard, type TileTone } from "../product-card";
 import { configString, type Asset } from "./slots";
@@ -35,11 +35,12 @@ export function ProductMosaic({
     <div className="relative grid h-full min-h-[28rem] grid-rows-2 gap-2 overflow-hidden rounded-3xl">
       {images.map((img) => (
         <div key={img.id} className="relative overflow-hidden rounded-3xl bg-blush">
-          <Image
+          <ArtImage
             src={img.image_url as string}
+            mobileSrc={img.mobile_image_url}
             alt={img.image_alt}
-            fill
             sizes="(min-width: 1024px) 40vw, 100vw"
+            mobileSizes="100vw"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
           />
         </div>

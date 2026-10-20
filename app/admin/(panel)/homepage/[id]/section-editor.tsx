@@ -12,12 +12,12 @@ import type { HomepageSectionType } from "@/types/db";
 import { saveSection } from "../actions";
 
 export type EditorSlot = {
-  images: { url: string | null; alt: string }[];
+  images: { url: string | null; alt: string; mobileUrl: string | null }[];
   fields: Record<SlotField, string>;
 };
 
 const emptySlot = (images: number): EditorSlot => ({
-  images: Array.from({ length: images }, () => ({ url: null, alt: "" })),
+  images: Array.from({ length: images }, () => ({ url: null, alt: "", mobileUrl: null })),
   fields: { heading: "", subheading: "", button_label: "", link_url: "", badge_text: "" },
 });
 
@@ -230,6 +230,15 @@ export function SectionEditor({
                         aria-label={`${label} description`}
                         className={`${inputCls} py-1.5 lg:text-sm`}
                       />
+                      <ImageUpload
+                        label={`${label}: phone version (optional)`}
+                        folder="homepage"
+                        aspect={spec.mobileAspect ?? spec.aspect}
+                        className="w-1/2 min-w-32"
+                        value={slot.images[j]?.mobileUrl ?? null}
+                        onChange={(mobileUrl) => setSlot(i, { images: slot.images.map((im, k) => (k === j ? { ...im, mobileUrl } : im)) })}
+                      />
+                      <p className="text-xs text-ink-muted">Shown on phones. Leave empty to use the image above everywhere.</p>
                     </div>
                   ))}
                 </div>

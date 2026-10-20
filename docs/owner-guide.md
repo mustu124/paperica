@@ -64,6 +64,8 @@ The product page now shows a **Customise on WhatsApp** button. When a customer t
    - Change the text, button label and link in the same box.
 4. Tap **Save section**.
 
+**Different picture on phones:** under each image there's a smaller **"phone version (optional)"** upload. Use it when a wide laptop banner doesn't crop well on a phone — for example a tall 4:5 photo for the hero. Phones show the phone version; laptops and tablets show the main image. Leave it empty to use the main image everywhere.
+
 On the **Homepage** list, the arrows move a section up or down. The **Shown / Hidden** switch shows or hides it.
 
 Photo sizes that work well:

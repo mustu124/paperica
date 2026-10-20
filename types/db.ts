@@ -187,6 +187,8 @@ export type Database = {
           section_id: string;
           slot: number;
           image_url: string | null;
+          /** Optional phone version of image_url (homepage art direction). */
+          mobile_image_url: string | null;
           image_alt: string;
           link_url: string | null;
           heading: string | null;

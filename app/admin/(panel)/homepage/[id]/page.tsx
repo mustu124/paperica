@@ -56,7 +56,7 @@ async function Section({ params }: Props) {
     const rows = (bySlot.get(i) ?? []).sort((a, b) => a.sort_order - b.sort_order);
     const a = rows[0];
     return {
-      images: spec.images.map((_, j) => ({ url: rows[j]?.image_url ?? null, alt: rows[j]?.image_alt ?? "" })),
+      images: spec.images.map((_, j) => ({ url: rows[j]?.image_url ?? null, alt: rows[j]?.image_alt ?? "", mobileUrl: rows[j]?.mobile_image_url ?? null })),
       fields: {
         heading: a?.heading ?? "",
         subheading: a?.subheading ?? "",

@@ -21,6 +21,8 @@ export type SectionSpec = {
   slotLabel: string; // e.g. "Panel" → "Panel 1"
   images: string[]; // labels per image, e.g. ["Image A", "Image B"]; [] = no images
   aspect: string;
+  /** Shape of the optional phone image (defaults to `aspect`). */
+  mobileAspect?: string;
   fields: { key: SlotField; label: string; multiline?: boolean; hint?: string; link?: boolean }[];
   config: ConfigField[];
   settings?: SettingField[];
@@ -41,16 +43,17 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
   hero: {
     title: "Hero banner",
     description:
-      "Full-width banner slides at the top (arrows to move between them). Each slide swaps between image A and image B. Use wide photos (about 2400 × 1000) with space on the left for the text.",
-    slots: { fixed: 3 },
+      "Full-width banner slides at the top (1–3; arrows move between them). Each slide swaps between image A and image B. Laptop images: about 2400 × 1000. Phone versions: 1080 × 1920. If the banner already has its text and button drawn in, leave the text fields empty and just set the link: the whole banner becomes clickable.",
+    slots: { min: 1, max: 3 },
     slotLabel: "Slide",
     images: ["Image A", "Image B"],
     aspect: "aspect-[12/5]",
+    mobileAspect: "aspect-[9/16]",
     fields: [
       { key: "heading", label: "Heading (optional)", hint: "Wrap words in *stars* for the handwritten script, e.g. A little paper happiness for your *everyday life.*" },
       { key: "subheading", label: "Short line (optional)" },
-      { key: "button_label", label: "Button label", hint: "e.g. Shop now" },
-      { key: "link_url", label: "Button link", link: true },
+      { key: "button_label", label: "Button label (optional)", hint: "e.g. Shop now. Leave empty to make the whole banner the link." },
+      { key: "link_url", label: "Link", link: true },
     ],
     config: [
       {
@@ -102,6 +105,7 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
     slotLabel: "Banner",
     images: ["Image A", "Image B"],
     aspect: "aspect-[9/10]",
+    mobileAspect: "aspect-[4/5]",
     fields: [
       { key: "heading", label: "Heading" },
       { key: "subheading", label: "Smaller line" },

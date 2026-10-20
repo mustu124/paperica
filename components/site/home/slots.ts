@@ -6,7 +6,7 @@ export type Asset = Tables<"homepage_assets">;
 export type Slot = {
   slot: number;
   primary: Asset;
-  images: { url: string; alt: string }[]; // [A] or [A, B]
+  images: { url: string; alt: string; mobileUrl: string | null }[]; // [A] or [A, B]; mobileUrl = phone version
 };
 
 /** Groups a section's assets by slot, ordered by slot then sort_order. */
@@ -24,7 +24,7 @@ export function groupSlots(assets: Asset[]): Slot[] {
         images: sorted
           .filter((a) => a.image_url)
           .slice(0, 2)
-          .map((a) => ({ url: a.image_url as string, alt: a.image_alt })),
+          .map((a) => ({ url: a.image_url as string, alt: a.image_alt, mobileUrl: a.mobile_image_url ?? null })),
       };
     });
 }

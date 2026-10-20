@@ -43,7 +43,8 @@ on conflict (slug) do update set
   default_mode = excluded.default_mode;
 
 -- ===========================================================================
--- Subcategories (exact labels and order from the master category structure)
+-- Subcategories (exact labels and order from the master category structure, as revised by the
+-- Website Catalogue V3: Snap-in Separators also under NEW IN; no Bookmarks or Cards at launch)
 -- ===========================================================================
 
 insert into public.subcategories (category_id, name, slug, sort_order, kind)
@@ -52,6 +53,7 @@ from (values
   ('new-in', 'View All',        'view-all',        1, 'view_all'),
   ('new-in', 'New Collection',  'new-collection',  2, 'filter_new'),
   ('new-in', 'Best Sellers',    'best-sellers',    3, 'filter_best'),
+  ('new-in', 'Snap-in Separators', 'snap-in-separators', 4, 'manual'),
 
   ('notebooks-journals', 'View All',               'view-all',               1, 'view_all'),
   ('notebooks-journals', 'Spiral-Bound Notebooks', 'spiral-bound-notebooks', 2, 'manual'),
@@ -64,10 +66,8 @@ from (values
 
   ('paper-edit', 'View All',           'view-all',           1, 'view_all'),
   ('paper-edit', 'Notepads',           'notepads',           2, 'manual'),
-  ('paper-edit', 'Bookmarks',          'bookmarks',          3, 'manual'),
-  ('paper-edit', 'Snap-in Separators', 'snap-in-separators', 4, 'manual'),
-  ('paper-edit', 'Cards',              'cards',              5, 'manual'),
-  ('paper-edit', 'Sticky Notes',       'sticky-notes',       6, 'manual'),
+  ('paper-edit', 'Snap-in Separators', 'snap-in-separators', 3, 'manual'),
+  ('paper-edit', 'Sticky Notes',       'sticky-notes',       4, 'manual'),
 
   ('gifts', 'View All',           'view-all',           1, 'view_all'),
   ('gifts', 'Gifts for Her',      'gifts-for-her',      2, 'manual'),
@@ -669,7 +669,7 @@ cross join (values
 ) as v(slot, badge_text, heading, subheading);
 
 -- ===========================================================================
--- Placeholder products for layout testing.
+-- Placeholder products for layout testing (only added when the shop has no real products).
 -- Every name starts with "[Replace me]" and every image lives in /public/placeholders.
 -- Delete these before launch (Admin → Products, or:
 --   delete from public.products where slug like 'placeholder-%';)
@@ -678,7 +678,7 @@ cross join (values
 insert into public.products
   (name, slug, short_description, description_html, price_inr, compare_at_price_inr, sku,
    stock_qty, track_stock, mode, badge_text, is_new, is_best_seller, low_stock_message, sort_order)
-values
+select * from (values
   ('[Replace me] Spiral Notebook A5', 'placeholder-spiral-notebook-a5',
    'Replace me: placeholder product for layout testing.', '<p>Replace me: placeholder product for layout testing. Replace with real product copy.</p>',
    449, null, 'PH-001', 40, true, 'buy', null, true, false, null, 1),
@@ -715,6 +715,9 @@ values
   ('[Replace me] Custom Planner', 'placeholder-custom-planner',
    'Replace me: placeholder personalised product for layout testing.', '<p>Replace me: placeholder personalised product. Customised via WhatsApp — no cart or checkout.</p>',
    null, null, 'PH-012', null, false, 'whatsapp', null, false, false, null, 12)
+) as v
+-- Samples are only for an empty shop: once real products exist, re-running never adds them back.
+where not exists (select 1 from public.products where slug not like 'placeholder-%')
 on conflict (slug) do nothing;
 
 update public.products

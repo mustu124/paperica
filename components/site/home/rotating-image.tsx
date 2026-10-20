@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
+import { ArtImage } from "@/components/ui/art-image";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
-type Img = { url: string; alt: string };
+type Img = { url: string; alt: string; mobileUrl?: string | null };
 
 /**
- * Two stacked images that crossfade A ⇄ B every `intervalMs` (~400ms fade).
+ * Two stacked images that crossfade A ⇄ B every `intervalMs` (~400ms fade). Each may have a
+ * separate phone version (shown below the md breakpoint).
  * `offsetMs` staggers neighbouring panels so they don't flip in unison.
  * Shows only image A when the user prefers reduced motion; pauses while the tab is hidden
  * or the image is off-screen.
@@ -17,6 +18,7 @@ export function RotatingImage({
   intervalMs,
   offsetMs = 0,
   sizes,
+  mobileSizes,
   priority = false,
   eager = false,
   className,
@@ -25,6 +27,8 @@ export function RotatingImage({
   intervalMs: number;
   offsetMs?: number;
   sizes: string;
+  /** Sizes hint for the phone versions (when set). */
+  mobileSizes?: string;
   /** Preload image A (use for the LCP image only). */
   priority?: boolean;
   /** Load without lazy-loading (above-the-fold images that aren't preloaded). */
@@ -76,21 +80,23 @@ export function RotatingImage({
 
   return (
     <div ref={ref} className={cn("absolute inset-0", className)}>
-      <Image
+      <ArtImage
         src={a.url}
+        mobileSrc={a.mobileUrl}
         alt={a.alt}
-        fill
         sizes={sizes}
+        mobileSizes={mobileSizes}
         priority={priority}
         loading={priority ? undefined : eager ? "eager" : "lazy"}
         className="object-cover"
       />
       {b && (
-        <Image
+        <ArtImage
           src={b.url}
+          mobileSrc={b.mobileUrl}
           alt={b.alt}
-          fill
           sizes={sizes}
+          mobileSizes={mobileSizes}
           // B must be ready by the first swap, but shouldn't compete with A for bandwidth.
           loading={priority || eager ? "eager" : "lazy"}
           fetchPriority="low"

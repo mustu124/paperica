@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { Fragment } from "react";
+import { ArtImage } from "@/components/ui/art-image";
 import { ButtonLink } from "@/components/ui/button";
 import { Carousel } from "@/components/ui/carousel";
 import { StickerBadge } from "@/components/ui/sticker-badge";
@@ -26,11 +26,12 @@ export function PromoTrio({ section, settings }: { section: HomepageSection; set
           return (
             <div key={tile.slot} className="relative aspect-square overflow-hidden rounded-3xl bg-blush">
               {tile.images[0] && (
-                <Image
+                <ArtImage
                   src={tile.images[0].url}
+                  mobileSrc={tile.images[0].mobileUrl}
                   alt={tile.images[0].alt}
-                  fill
                   sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 85vw"
+                  mobileSizes="85vw"
                   className="object-cover"
                 />
               )}

@@ -44,7 +44,7 @@ const sectionInput = z.object({
   slots: z
     .array(
       z.object({
-        images: z.array(z.object({ url: z.string().max(1000).nullable(), alt: text })).max(2),
+        images: z.array(z.object({ url: z.string().max(1000).nullable(), alt: text, mobileUrl: z.string().max(1000).nullable().optional() })).max(2),
         fields: z.object({
           heading: text.optional(),
           subheading: text.optional(),
@@ -80,12 +80,27 @@ export async function saveSection(id: string, type: HomepageSectionType, input: 
       return { ok: false, error: `“${value}” isn't a valid link. Start with / for pages in the shop, or https://.` };
   }
 
+  // Phone images need the 20261019000700 migration; only send the column when one is used,
+  // so saving still works on a database that hasn't been updated yet.
+  const usesMobile = slots.some((slot) => slot.images.some((img) => img.mobileUrl));
+  if (usesMobile) {
+    // Check before deleting anything, so a missing column can't leave the section empty.
+    const { error: columnError } = await supabase.from("homepage_assets").select("mobile_image_url").limit(1);
+    if (columnError) return { ok: false, error: friendlyError(columnError) };
+  }
   // Assets: one row per image (or one text-only row when the section has no images).
   const rows = slots.flatMap((slot, i) => {
     const count = Math.max(spec.images.length, 1);
     return Array.from({ length: count }, (_, j) => {
       const img = slot.images[j];
-      const base = { section_id: id, slot: i, sort_order: j, image_url: img?.url || null, image_alt: img?.alt ?? "" };
+      const base = {
+        section_id: id,
+        slot: i,
+        sort_order: j,
+        image_url: img?.url || null,
+        image_alt: img?.alt ?? "",
+        ...(usesMobile ? { mobile_image_url: (img?.url && img.mobileUrl) || null } : {}),
+      };
       if (j > 0) return base;
       const f = slot.fields;
       return {

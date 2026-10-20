@@ -116,6 +116,7 @@ Open Supabase → SQL Editor, and run each file in `supabase/migrations` in orde
 | `…000300_orders.sql` | `orders`, `order_items`, `razorpay_events`; `next_order_number()` → `PPR-000001`, `PPR-000002`, … |
 | `…000400_storage.sql` | Public-read `media` bucket (folders `products/`, `homepage/`, `categories/`, `pages/`); admin-only writes; images only, 10 MB max |
 | `20261019000500_branding.sql` | Adds the `branding/` upload folder, the `og_image_url` setting, and switches the footer image to the logo |
+| `20261019000700_mobile_images.sql` | Optional phone image per homepage image (`homepage_assets.mobile_image_url`), served with `<picture>` art direction (`components/ui/art-image.tsx`) |
 
 **Access rules (RLS):** the public can read active products (and their images, variants and
 placements), categories, subcategories, settings, pages, active FAQs and active homepage

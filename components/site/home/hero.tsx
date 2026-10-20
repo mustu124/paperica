@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Fragment } from "react";
 import { ButtonLink } from "@/components/ui/button";
@@ -45,12 +46,15 @@ export function Hero({
   settings: SiteSettings;
   intervalMs: number;
 }) {
-  const panels = groupSlots(section.assets).slice(0, 3);
+  const hasText = (p: ReturnType<typeof groupSlots>[number]["primary"]) =>
+    Boolean(p.heading || p.subheading || (p.button_label && p.link_url));
+  // Slides with neither an image nor text (e.g. left empty in the editor) are skipped.
+  const panels = groupSlots(section.assets)
+    .filter((p) => p.images.length > 0 || hasText(p.primary))
+    .slice(0, 3);
   if (panels.length === 0) return null;
   const headingClass = HEADING_FONT[configString(section.config, "heading_font")] ?? HEADING_FONT.playful;
   const light = configString(section.config, "text_tone") === "light";
-  const hasText = (p: (typeof panels)[number]["primary"]) =>
-    Boolean(p.heading || p.subheading || (p.button_label && p.link_url));
   // Start on the slide that carries the headline.
   const startIndex = Math.max(0, panels.findIndex((p) => hasText(p.primary)));
 
@@ -74,19 +78,31 @@ export function Hero({
           const line = p.subheading ? renderTokensText(p.subheading, settings) : "";
 
           return (
-            <div key={panel.slot} className="relative aspect-[4/5] overflow-hidden sm:aspect-[4/3] md:aspect-[16/7] lg:aspect-[12/5]">
+            <div
+              key={panel.slot}
+              className={cn(
+                "relative overflow-hidden md:aspect-[16/7] lg:aspect-[12/5]",
+                // A dedicated phone banner (e.g. 1080 × 1920) is shown in full on phones.
+                panel.images[0]?.mobileUrl ? "aspect-[9/16]" : "aspect-[4/5] sm:aspect-[4/3]",
+              )}
+            >
               <RotatingImage
                 images={panel.images}
                 intervalMs={intervalMs}
                 offsetMs={intervalMs}
                 sizes="100vw"
+                mobileSizes="100vw"
                 priority={i === startIndex}
                 eager={i === startIndex}
               />
+              {/* Banner with its text and button drawn in: the whole slide is the link. */}
+              {p.link_url && !p.button_label && (
+                <Link href={p.link_url} aria-label={panel.images[0]?.alt || "Shop now"} className="absolute inset-0 z-[1]" />
+              )}
               {hasText(p) && (
                 <div
                   className={cn(
-                    "absolute inset-0 flex flex-col justify-end px-6 pb-14 sm:px-10 md:justify-center md:pb-0 lg:px-20",
+                    "pointer-events-none absolute inset-0 flex flex-col justify-end px-6 pb-14 sm:px-10 md:justify-center md:pb-0 lg:px-20",
                     light
                       ? "bg-gradient-to-t from-ink/60 via-ink/20 to-transparent text-white md:bg-gradient-to-r md:from-ink/50 md:via-ink/15"
                       : "bg-gradient-to-t from-blush via-blush/70 to-transparent text-ink md:bg-gradient-to-r md:from-blush/85 md:via-blush/40 md:to-transparent",
@@ -105,7 +121,7 @@ export function Hero({
                       </p>
                     )}
                     {p.button_label && p.link_url && (
-                      <ButtonLink href={p.link_url} size="lg" className="mt-6">
+                      <ButtonLink href={p.link_url} size="lg" className="pointer-events-auto mt-6">
                         {p.button_label}
                         <ArrowRight className="size-4" aria-hidden />
                       </ButtonLink>

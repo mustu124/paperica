@@ -45,3 +45,6 @@ next-env.d.ts
 # brand source documents (handover, reference layout, logo originals) are kept out of this
 # public repo; the logo files the site uses live in public/brand
 /brand/
+
+# Original photo bank (1.8 GB of PNGs). Optimised copies are uploaded to Supabase Storage.
+/PAPERICA IMAGE BANK/

@@ -31,6 +31,8 @@ export function friendlyError(error: { message: string; code?: string } | null |
     return "Products in PERSONALISED must use “Customise on WhatsApp”. Remove the PERSONALISED categories first, or keep WhatsApp mode.";
   if (error.message.includes("products_price_required_for_buy"))
     return "Products sold online need a price. Only “Customise on WhatsApp” products can leave the price empty.";
+  if (error.message.includes("mobile_image_url"))
+    return "Phone images need a database update first: run supabase/migrations/20261019000700_mobile_images.sql in the Supabase SQL editor.";
   if (error.code === "42501") return "You don't have permission to do that. Please sign in again.";
   console.error("[admin]", error.code, error.message);
   return fallback;

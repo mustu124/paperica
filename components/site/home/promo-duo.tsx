@@ -29,6 +29,7 @@ export function PromoDuo({
               intervalMs={intervalMs}
               offsetMs={intervalMs + i * Math.round(intervalMs / 2)}
               sizes="(min-width: 768px) 50vw, 100vw"
+              mobileSizes="100vw"
             />
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center bg-gradient-to-t from-ink/55 via-ink/20 to-transparent px-6 pt-24 text-center text-white">
               {p.heading && (
