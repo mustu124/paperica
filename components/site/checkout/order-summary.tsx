@@ -23,14 +23,29 @@ export function OrderSummary({ quote }: { quote: Quote }) {
             <div className="min-w-0 flex-1 text-sm">
               <p className="leading-snug">{l.name}</p>
               {l.variantLabel && <p className="text-xs text-ink-muted">{l.variantLabel}</p>}
-              <p className="text-xs text-ink-muted">
-                {l.qty} × {formatINR(l.unitPrice)}
-              </p>
+              {l.free ? (
+                <p className="text-xs font-medium text-chilli">Free gift</p>
+              ) : (
+                <p className="text-xs text-ink-muted">
+                  {l.qty} × {formatINR(l.unitPrice)}
+                </p>
+              )}
             </div>
-            <p className="shrink-0 text-sm">{formatINR(l.lineTotal)}</p>
+            <p className={l.free ? "shrink-0 text-sm font-medium text-stem-deep" : "shrink-0 text-sm"}>
+              {l.free ? "Free" : formatINR(l.lineTotal)}
+            </p>
           </li>
         ))}
       </ul>
+
+      {quote.offer && quote.offer.status !== "applied" && (
+        <p role="status" className="rounded-md bg-butter/70 px-3 py-2 text-xs">
+          {quote.offer.status === "add_more"
+            ? `Add ${quote.offer.remaining} more from the New Collection to get your free gift.`
+            : "The free gift is out of stock right now, so it can't be added to this order."}
+          {quote.offer.text && <span className="block text-ink-muted">{quote.offer.text}</span>}
+        </p>
+      )}
 
       <dl className="space-y-2 border-t border-taupe pt-4 text-sm">
         <div className="flex justify-between">

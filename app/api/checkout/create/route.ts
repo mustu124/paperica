@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       order_id: order.id,
       product_id: l.productId,
       variant_id: l.variantId,
-      product_name: l.name,
+      product_name: l.free ? `${l.name} (free gift)` : l.name,
       variant_label: l.variantLabel,
       unit_price_inr: l.unitPrice,
       qty: l.qty,

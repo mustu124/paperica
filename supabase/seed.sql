@@ -93,7 +93,7 @@ on conflict (category_id, slug) do update set
 insert into public.site_settings (key, value) values
   ('brand_name',                      to_jsonb('Paperica'::text)),
   ('tagline',                         to_jsonb('All Things Paper'::text)),
-  ('announcement_bar_text',           to_jsonb('Free shipping on orders above ₹{{free_shipping_threshold_inr}} | Delivering across India · Standard shipping ₹{{standard_shipping_fee_inr}} per order'::text)),
+  ('announcement_bar_text',           to_jsonb('Buy any 2 from the New Collection, get Snap-in Separators free | Free shipping on orders above ₹{{free_shipping_threshold_inr}} | Delivering across India · Standard shipping ₹{{standard_shipping_fee_inr}} per order'::text)),
   ('announcement_bar_enabled',        'true'::jsonb),
   ('contact_email',                   to_jsonb('paperica26@gmail.com'::text)),
   ('whatsapp_number',                 to_jsonb('919769223863'::text)),
@@ -123,6 +123,12 @@ insert into public.site_settings (key, value) values
 <p>Our mission is to bring more creativity and colour into everyday life through thoughtfully designed stationery. We want to make planning, journalling and putting pen to paper feel more personal and enjoyable, one page at a time.</p>$h$::text)),
   ('free_shipping_threshold_inr',     '1500'::jsonb),
   ('hero_rotation_ms',                '3000'::jsonb),
+
+  -- Free gift offer: buying this many products marked New adds the free product at checkout
+  ('gift_offer_enabled',              'true'::jsonb),
+  ('gift_offer_text',                 to_jsonb('Buy any 2 from the New Collection and get a set of Snap-in Separators free'::text)),
+  ('gift_offer_min_qty',              '2'::jsonb),
+  ('gift_offer_product_slug',         to_jsonb('snap-in-separators'::text)),
   ('cart_message',                    to_jsonb('Standard shipping of ₹{{standard_shipping_fee_inr}} per order is added at checkout.'::text)),
 
   -- Product page

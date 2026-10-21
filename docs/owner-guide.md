@@ -91,6 +91,26 @@ Dispatch and delivery times are on the same page, for example "4–6 business da
 
 ---
 
+## Free gift offer
+
+When a customer buys enough products marked **New**, a free item is added to their order at checkout at ₹0. It's set up as "Buy any 2 from the New Collection and get a set of Snap-in Separators free".
+
+- It's added automatically. The customer doesn't need a code. With only 1 New product in the cart, checkout tells them to add 1 more.
+- It's one free item per order. The free item itself doesn't count towards the 2.
+- If the free item is sold out, the order still goes through without it, and checkout says so.
+- In **Orders**, it shows as "Snap-in Separators (free gift)" at ₹0. Its stock goes down like any other item.
+
+To change or stop it, go to **Site Settings** → **Free gift offer**. You can:
+
+- turn the offer on or off;
+- change the text;
+- change how many New products are needed;
+- change the free product, by typing the end of its web address (for example `snap-in-separators`).
+
+Then tap **Save settings**. Remember to update the announcement bar text too.
+
+---
+
 ## Edit your founder story
 
 1. Go to **Pages & FAQs** → **About**.

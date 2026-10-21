@@ -9,7 +9,7 @@ import { renderTokensText } from "@/lib/content";
 import { getMenu } from "@/lib/data/menu";
 import { getSiteSettings } from "@/lib/data/settings";
 import { openGraphDefaults } from "@/lib/seo";
-import { settingString } from "@/lib/settings";
+import { settingBool, settingString } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -41,6 +41,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       <FloatingWhatsApp settings={settings} />
       <CartDrawer
         cartMessage={renderTokensText(settingString(settings, "cart_message"), settings)}
+        offerText={settingBool(settings, "gift_offer_enabled") ? settingString(settings, "gift_offer_text") : ""}
         emptyCta={firstHead ? { label: firstHead.name, href: firstHead.href } : null}
       />
     </CartProvider>

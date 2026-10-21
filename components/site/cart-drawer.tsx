@@ -6,15 +6,19 @@ import { ButtonLink } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { ScribbleCircle } from "@/components/ui/scribble-circle";
+import { Gift } from "lucide-react";
 import { formatINR } from "@/lib/format";
 import { useCart } from "./cart-provider";
 
 /** Slide-in cart. Empty and filled states mirror the reference layout. */
 export function CartDrawer({
   cartMessage,
+  offerText,
   emptyCta,
 }: {
   cartMessage: string;
+  /** Free gift offer, when it's switched on (applied at checkout). */
+  offerText: string;
   emptyCta: { label: string; href: string } | null;
 }) {
   const { items, subtotal, isOpen, close, setQty, remove } = useCart();
@@ -32,6 +36,12 @@ export function CartDrawer({
               <span>Subtotal</span>
               <span className="font-medium">{formatINR(subtotal)}</span>
             </div>
+            {offerText && (
+              <p className="flex items-start gap-2 rounded-md bg-butter/70 px-3 py-2 text-xs">
+                <Gift className="mt-px size-4 shrink-0 text-chilli" aria-hidden />
+                <span>{offerText} — added at checkout.</span>
+              </p>
+            )}
             <p className="text-xs text-ink-muted">
               {cartMessage || "Shipping calculated at checkout."}
             </p>
