@@ -9,6 +9,10 @@ import type { MenuCategory } from "@/lib/data/menu";
 import { cn } from "@/lib/cn";
 import { titleCase } from "@/lib/format";
 
+/** A panel whose items all have their own photo (e.g. GIFTS → the four sets) shows them all, named. */
+const showsItemCards = (cat: MenuCategory) =>
+  cat.subcategories.length > 0 && cat.subcategories.length <= 4 && cat.subcategories.every((s) => s.image);
+
 /**
  * Desktop nav (on the header's pink) with full-width mega-menu panels. The current section is
  * underlined in chilli; "Home" comes first.
@@ -136,6 +140,47 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
               </div>
             )}
             {(() => {
+              // Every item has its own photo (e.g. GIFTS → the four sets): show them all, named.
+              const cards = showsItemCards(cat);
+              if (!cards) return null;
+              return (
+                <div className="border-l border-taupe pl-10">
+                  <ul className="grid grid-cols-4 gap-5">
+                    {cat.subcategories.map((sub) => (
+                      <li key={sub.id}>
+                        <Link
+                          href={sub.href}
+                          onClick={close}
+                          onMouseEnter={() => setPreviewId(sub.id)}
+                          onMouseLeave={() => setPreviewId(null)}
+                          className="group block"
+                        >
+                          <div
+                            className={cn(
+                              "relative aspect-[4/5] overflow-hidden rounded-3xl bg-blush ring-chilli ring-offset-2 ring-offset-cream transition",
+                              previewId === sub.id && "ring-2",
+                            )}
+                          >
+                            <Image
+                              src={sub.image!.url}
+                              alt={sub.image!.alt}
+                              fill
+                              sizes="220px"
+                              loading="eager"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          </div>
+                          <p className={cn("mt-2 text-sm leading-snug group-hover:text-chilli", previewId === sub.id && "text-chilli")}>{sub.name}</p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+
+            {(() => {
+              if (showsItemCards(cat)) return null;
               const preview = cat.subcategories.find((s) => s.id === previewId && s.image);
               if (!preview?.image) return null;
               return (
@@ -150,7 +195,9 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
               );
             })()}
 
-            {!cat.subcategories.some((s) => s.id === previewId && s.image) && cat.featureImages.length > 0 && (
+            {!showsItemCards(cat) &&
+              !cat.subcategories.some((s) => s.id === previewId && s.image) &&
+              cat.featureImages.length > 0 && (
               <div className="border-l border-taupe pl-10">
                 <ul className="flex gap-6">
                   {cat.featureImages.map((img, i) => (
