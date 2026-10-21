@@ -108,7 +108,10 @@ async function ProductContent({ params }: Pick<Props, "params">) {
     ...(product.primary
       ? [
           { label: titleCase(product.primary.category.name), href: product.primary.category.href },
-          { label: product.primary.subcategory.name, href: product.primary.subcategory.href },
+          // A menu item that links to this very product (e.g. a gift set) would repeat its name.
+          ...(product.primary.subcategory.linkUrl
+            ? []
+            : [{ label: product.primary.subcategory.name, href: product.primary.subcategory.href }]),
         ]
       : []),
     { label: product.name },
