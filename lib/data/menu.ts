@@ -10,6 +10,8 @@ export type MenuSubcategory = {
   slug: string;
   kind: SubcategoryKind;
   href: string;
+  /** Picture shown when the item is hovered: the main photo of its first product. */
+  image: { url: string; alt: string } | null;
 };
 
 export type MenuCategory = {
@@ -41,10 +43,10 @@ export function subcategoryHref(categorySlug: string, sub: { slug: string; kind:
 export async function getMenu(): Promise<MenuCategory[]> {
   "use cache";
   cacheLife("hours");
-  cacheTag(TAGS.menu);
+  cacheTag(TAGS.menu, TAGS.products);
 
   const supabase = createPublicClient();
-  const [cats, subs] = await Promise.all([
+  const [cats, subs, previews] = await Promise.all([
     supabase
       .from("categories")
       .select("id, name, slug, sort_order, image_url, menu_feature_images")
@@ -52,6 +54,7 @@ export async function getMenu(): Promise<MenuCategory[]> {
       .order("sort_order"),
     // "*" so the menu still loads on a database without the link_url column yet.
     supabase.from("subcategories").select("*").order("sort_order"),
+    subcategoryPreviews(),
   ]);
 
   if (cats.error || subs.error) {
@@ -76,6 +79,35 @@ export async function getMenu(): Promise<MenuCategory[]> {
         slug: s.slug,
         kind: s.kind,
         href: subcategoryHref(c.slug, s),
+        image: previews.get(s.id) ?? null,
       })),
   }));
+}
+
+/** subcategory id → main photo of its first active product (menu sort order). Never throws. */
+async function subcategoryPreviews(): Promise<Map<string, { url: string; alt: string }>> {
+  const supabase = createPublicClient(); // RLS: active products only
+  const [links, products, images] = await Promise.all([
+    supabase.from("product_subcategories").select("product_id, subcategory_id"),
+    supabase.from("products").select("id, name, sort_order").eq("is_active", true).order("sort_order"),
+    supabase.from("product_images").select("product_id, url, alt, sort_order").order("sort_order"),
+  ]);
+  const out = new Map<string, { url: string; alt: string }>();
+  if (links.error || products.error || images.error) return out;
+  const firstImage = new Map<string, { url: string; alt: string }>();
+  const names = new Map(products.data.map((p) => [p.id, p.name]));
+  for (const i of images.data) {
+    if (!firstImage.has(i.product_id)) firstImage.set(i.product_id, { url: i.url, alt: i.alt || names.get(i.product_id) || "" });
+  }
+  const order = new Map(products.data.map((p, i) => [p.id, i]));
+  const bySub = new Map<string, string[]>();
+  for (const l of links.data) {
+    if (!order.has(l.product_id) || !firstImage.has(l.product_id)) continue;
+    bySub.set(l.subcategory_id, [...(bySub.get(l.subcategory_id) ?? []), l.product_id]);
+  }
+  for (const [sub, ids] of bySub) {
+    ids.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0));
+    out.set(sub, firstImage.get(ids[0])!);
+  }
+  return out;
 }

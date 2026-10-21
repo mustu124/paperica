@@ -17,6 +17,8 @@ import { titleCase } from "@/lib/format";
  */
 export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathname?: string | null }) {
   const [openId, setOpenId] = useState<string | null>(null);
+  // Hovered/focused menu item: its photo replaces the panel's pictures while pointed at.
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -35,6 +37,7 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
   const close = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
     setOpenId(null);
+    setPreviewId(null);
   }, []);
 
   return (
@@ -108,12 +111,14 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
                 </Link>
               </p>
               <p className="mb-3 text-[0.6875rem] font-semibold uppercase tracking-[0.2em]">{cat.name}</p>
-              <ul className="space-y-2">
+              <ul className="space-y-2" onMouseLeave={() => setPreviewId(null)}>
                 {cat.subcategories.map((sub) => (
                   <li key={sub.id}>
                     <Link
                       href={sub.href}
                       onClick={close}
+                      onMouseEnter={() => setPreviewId(sub.image ? sub.id : null)}
+                      onFocus={() => setPreviewId(sub.image ? sub.id : null)}
                       className="text-sm text-ink/80 hover:text-chilli hover:underline hover:underline-offset-4"
                     >
                       {sub.name}
@@ -123,7 +128,29 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
               </ul>
             </div>
 
-            {cat.featureImages.length > 0 && (
+            {openId === cat.id && (
+              <div aria-hidden className="pointer-events-none absolute size-px overflow-hidden opacity-0">
+                {cat.subcategories.flatMap((s) =>
+                  s.image ? [<Image key={s.id} src={s.image.url} alt="" width={256} height={320} sizes="256px" loading="eager" />] : [],
+                )}
+              </div>
+            )}
+            {(() => {
+              const preview = cat.subcategories.find((s) => s.id === previewId && s.image);
+              if (!preview?.image) return null;
+              return (
+                <div className="border-l border-taupe pl-10">
+                  <Link href={preview.href} onClick={close} className="group block w-full max-w-64">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-blush">
+                      <Image key={preview.id} src={preview.image.url} alt={preview.image.alt} fill sizes="256px" loading="eager" className="object-cover" />
+                    </div>
+                    <p className="mt-2 text-sm text-chilli">{preview.name}</p>
+                  </Link>
+                </div>
+              );
+            })()}
+
+            {!cat.subcategories.some((s) => s.id === previewId && s.image) && cat.featureImages.length > 0 && (
               <div className="border-l border-taupe pl-10">
                 <ul className="flex gap-6">
                   {cat.featureImages.map((img, i) => (
