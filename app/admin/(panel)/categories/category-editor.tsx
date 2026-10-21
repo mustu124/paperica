@@ -127,7 +127,7 @@ export function CategoryEditor({
   const [footerNote, setFooterNote] = useState(category.footerNote);
   const [imageUrl, setImageUrl] = useState(category.imageUrl);
   const [features, setFeatures] = useState<Feature[]>(
-    [0, 1].map((i) => category.features[i] ?? { url: "", alt: "", label: "", link_url: "" }),
+    [0, 1, 2].map((i) => category.features[i] ?? { url: "", alt: "", label: "", link_url: "" }),
   );
   const [newSub, setNewSub] = useState("");
   const { run, pending } = useSave();
@@ -185,8 +185,8 @@ export function CategoryEditor({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium">Mega-menu feature images</p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <p className="mb-2 text-sm font-medium">Mega-menu feature images (up to 3)</p>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {features.map((f, i) => (
               <div key={i} className="grid grid-cols-[7rem_1fr] gap-3 rounded-md border border-taupe p-3">
                 <ImageUpload label={`Image ${i + 1}`} folder="categories" value={f.url || null} onChange={(url) => setFeature(i, { url: url ?? "" })} />
