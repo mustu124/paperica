@@ -160,8 +160,7 @@ Thank you for shopping with us!'::text)),
   ('footer_illustration_url',         to_jsonb('/brand/paperica-logo-trim.png'::text)), -- footer logo
   ('og_image_url',                    to_jsonb('/brand/paperica-og.jpg'::text)),        -- link-preview image, 1200×630
   ('mobile_menu_links', $j$[
-    {"label": "Contact", "href": "/contact"},
-    {"label": "Track Your Order", "href": "/track-order"}
+    {"label": "Contact", "href": "/contact"}
   ]$j$::jsonb),
   -- Footer columns. Link hrefs and labels may use {{tokens}} (e.g. mailto:{{contact_email}}).
   ('footer', $j${
@@ -171,7 +170,6 @@ Thank you for shopping with us!'::text)),
     "columns": [
       {"heading": "Help & Support", "links": [
         {"label": "Help Centre / FAQs", "href": "/faq"},
-        {"label": "Track Your Order", "href": "/track-order"},
         {"label": "Shipping Policy", "href": "/shipping-policy"},
         {"label": "Cancellation, Returns & Refund Policy", "href": "/cancellation-returns-refund-policy"}
       ]},

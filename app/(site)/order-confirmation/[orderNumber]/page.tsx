@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { CheckCircle2, Clock } from "lucide-react";
 import { Suspense } from "react";
 import { z } from "zod";
@@ -75,10 +74,9 @@ async function Confirmation({ params, searchParams }: Props) {
       <div className="space-y-4 text-center">
         <h1 className="font-serif text-3xl font-semibold">Thank you</h1>
         <p className="text-ink-muted">
-          To see the status of order <strong className="text-ink">{orderNumber}</strong>, use Track Your Order with the
-          mobile number or email you used at checkout.
+          For any question about order <strong className="text-ink">{orderNumber}</strong>, get in touch with us.
         </p>
-        <ButtonLink href="/track-order">Track your order</ButtonLink>
+        <ButtonLink href="/contact">Contact us</ButtonLink>
       </div>
     );
   }
@@ -122,13 +120,6 @@ async function Confirmation({ params, searchParams }: Props) {
           <h2 className="mb-1 font-medium">What happens next</h2>
           <p>{s("ready_stock_dispatch_text")}</p>
           {s("ready_stock_delivery_text") && <p>{s("ready_stock_delivery_text")}</p>}
-          <p className="mt-2">
-            You can check progress any time on{" "}
-            <Link href="/track-order" className="text-chilli underline underline-offset-4">
-              Track Your Order
-            </Link>
-            .
-          </p>
         </section>
       )}
 

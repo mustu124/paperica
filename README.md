@@ -214,10 +214,9 @@ products are enquired on WhatsApp.
 5. Cancelled or failed payments keep the order (pending/failed) and offer "Try payment again".
 
 Only `payment_status = 'paid'` orders are confirmed orders; pending/failed ones are abandoned or
-in-progress checkouts. Checkout, quote, verify and `/api/track-order` are rate-limited per IP
-(`check_rate_limit()` in Postgres); checkout and tracking forms include a honeypot field.
-`/track-order` shows payment/dispatch status, courier and tracking details (never the address)
-for an order number + the mobile number or email used at checkout.
+in-progress checkouts. Checkout, quote and verify are rate-limited per IP
+(`check_rate_limit()` in Postgres); the checkout form includes a honeypot field. There is no
+public order-tracking page (`/track-order` redirects to Contact).
 
 No marketing email/SMS is sent. To add a transactional order-confirmation email later, implement
 `onOrderPaid()` in `lib/notifications.ts` (called exactly once per paid order).
@@ -310,7 +309,7 @@ The link signs the owner in and opens **Set a new password**.
 
 | Section | What the owner can do |
 | --- | --- |
-| Orders | Tabs for confirmed (paid) / pending / failed / refunded; search by order number, name or phone; filter by dispatch status; CSV export. Order page: customer & address (copy button), items, totals, Razorpay ids, dispatch status, courier & tracking (shown on Track Your Order), mark as refunded, **Open WhatsApp** with the `whatsapp_tracking_template` message, printable packing slip (no prices). |
+| Orders | Tabs for confirmed (paid) / pending / failed / refunded; search by order number, name or phone; filter by dispatch status; CSV export. Order page: customer & address (copy button), items, totals, Razorpay ids, dispatch status, mark as refunded, printable packing slip (no prices). |
 | Products | Search, thumbnails, active toggle, bulk activate/deactivate/New/Best Seller. Add/edit: name, auto slug, descriptions (rich text), price & compare-at, SKU, stock, purchase mode, badge, flags, low-stock message, categories grouped by head, options (with their own price/stock), multi-image upload with drag-to-reorder and alt text, preview, duplicate, delete (products in past orders are deactivated instead). |
 | Homepage | Sections in order: show/hide, move up/down, and a form per section (hero A/B images + text + swap speed; collection tiles; promo banners; product feature with up to 8 picked products; promo tiles with stickers; Instagram; info strip + footer blurb). |
 | Categories & Menu | Rename, reorder, show/hide the six heads; description, collection image and the two mega-menu feature images; rename/reorder subcategories, add new ones (hand-picked products) and delete those added ones. Web addresses never change. |
@@ -438,8 +437,6 @@ Razorpay keeps separate keys and webhooks for Test Mode and Live Mode.
   - [ ] Admin → Orders → **Confirmed (paid)** lists it, and the product's stock went down.
   - [ ] The Razorpay dashboard → Webhooks shows deliveries with response **200**.
   - [ ] A failed payment (`failure@razorpay`) shows under **Failed**, and "Try payment again" works.
-  - [ ] Track Your Order finds the order.
-  - [ ] Dispatching it in the admin (courier and tracking) shows on Track Your Order.
 - [ ] **Only after all of the above pass, go live:**
   1. Razorpay account activated (KYC done), with the policy pages live on the domain.
   2. Switch the dashboard to **Live Mode** and generate live keys.

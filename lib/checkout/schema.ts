@@ -59,12 +59,3 @@ export const verifyPaymentSchema = z.object({
   razorpay_signature: z.string().min(1).max(200),
 });
 
-export const trackOrderSchema = z.object({
-  orderNumber: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(/^PPR-\d{6,}$/, "Enter your order number, e.g. PPR-000123"),
-  contact: z.string().trim().min(5, "Enter the mobile number or email used at checkout").max(200),
-  website: z.string().optional(),
-});
