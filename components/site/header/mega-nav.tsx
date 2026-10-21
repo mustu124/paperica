@@ -199,7 +199,7 @@ export function MegaNav({ menu, pathname = null }: { menu: MenuCategory[]; pathn
               !cat.subcategories.some((s) => s.id === previewId && s.image) &&
               cat.featureImages.length > 0 && (
               <div className="border-l border-taupe pl-10">
-                <ul className="flex gap-6">
+                <ul className={cn("flex", cat.featureImages.length > 3 ? "gap-4" : "gap-6")}>
                   {cat.featureImages.map((img, i) => (
                     <li key={`${img.url}-${i}`} className="w-full max-w-64">
                       <Link href={img.link_url || cat.href} onClick={close} className="group block">

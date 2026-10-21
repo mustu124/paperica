@@ -18,7 +18,7 @@ const categoryInput = z.object({
   image_url: z.string().max(1000).nullable(),
   menu_feature_images: z
     .array(z.object({ url: z.string().max(1000), alt: z.string().trim().max(200), label: z.string().trim().max(80), link_url: linkOrPath }))
-    .max(3),
+    .max(5),
   /** Omitted = leave unchanged (keeps saving working before the gift-sets migration). */
   footer_note: z.string().trim().max(2000).optional(),
 });

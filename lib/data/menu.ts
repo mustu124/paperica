@@ -69,7 +69,7 @@ export async function getMenu(): Promise<MenuCategory[]> {
     href: categoryHref(c.slug),
     image: c.image_url,
     featureImages: Array.isArray(c.menu_feature_images)
-      ? c.menu_feature_images.filter((img) => img && typeof img.url === "string").slice(0, 3)
+      ? c.menu_feature_images.filter((img) => img && typeof img.url === "string").slice(0, 5)
       : [],
     subcategories: subs.data
       .filter((s) => s.category_id === c.id)
