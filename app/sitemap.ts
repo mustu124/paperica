@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tree.flatMap((c) => [
       { url: url(c.href), changeFrequency: "daily" as const, priority: 0.8 },
       ...c.subcategories
-        .filter((s) => s.kind !== "view_all" && s.kind !== "content_page")
+        .filter((s) => s.kind !== "view_all" && s.kind !== "content_page" && !s.linkUrl)
         .map((s) => ({ url: url(s.href), changeFrequency: "daily" as const, priority: 0.7 })),
     ]),
     ...catalog.products.map((p) => ({

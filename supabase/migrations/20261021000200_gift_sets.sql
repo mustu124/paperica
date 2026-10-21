@@ -8,7 +8,9 @@
 --
 -- The customer chooses designs on WhatsApp after ordering, so component stock is reduced by
 -- the owner when packing (until then the paid order holds the units back).
--- Also: an optional note at the bottom of a collection page (subcategories.footer_note).
+-- Also: an optional note at the bottom of a collection page (categories/subcategories.footer_note),
+-- and menu items that open another page (subcategories.link_url, e.g. a gift set's product page).
+-- Every statement is safe to run again.
 
 create table if not exists public.product_bundle_items (
   id             uuid primary key default gen_random_uuid(),
@@ -30,6 +32,8 @@ revoke all on public.product_bundle_items from anon;
 grant select, insert, update, delete on public.product_bundle_items to authenticated;
 
 alter table public.subcategories add column if not exists footer_note text;
+alter table public.subcategories add column if not exists link_url text;
+alter table public.categories add column if not exists footer_note text;
 
 -- ---------------------------------------------------------------------------
 -- Stock of every gift set, recalculated from its contents.

@@ -10,6 +10,8 @@ export type CategoryNode = {
   name: string;
   slug: string;
   description: string | null;
+  /** Note at the bottom of the head's page (e.g. GIFTS → "A little note before you order"). */
+  footerNote: string | null;
   href: string;
   subcategories: SubcategoryNode[];
 };
@@ -23,6 +25,8 @@ export type SubcategoryNode = {
   description: string | null;
   /** Note at the bottom of the collection page (e.g. Gift Sets → "A little note before you order"). */
   footerNote: string | null;
+  /** Menu item that opens another page (e.g. a gift set's product page) instead of a collection. */
+  linkUrl: string | null;
   href: string;
 };
 
@@ -34,7 +38,7 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
 
   const supabase = createPublicClient();
   const [cats, subs] = await Promise.all([
-    supabase.from("categories").select("id, name, slug, description, sort_order").order("sort_order"),
+    supabase.from("categories").select("*").order("sort_order"),
     supabase
       .from("subcategories")
       // "*" so the tree still loads on a database without the footer_note column yet.
@@ -51,6 +55,7 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
     name: c.name,
     slug: c.slug,
     description: c.description,
+    footerNote: c.footer_note ?? null,
     href: categoryHref(c.slug),
     subcategories: subs.data
       .filter((s) => s.category_id === c.id)
@@ -62,6 +67,7 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
         kind: s.kind,
         description: s.description,
         footerNote: s.footer_note ?? null,
+        linkUrl: s.link_url ?? null,
         href: subcategoryHref(c.slug, s),
       })),
   }));

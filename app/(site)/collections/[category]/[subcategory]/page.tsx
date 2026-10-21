@@ -10,7 +10,7 @@ export async function generateStaticParams() {
   const tree = await getCategoryTree();
   return withFallback(
     tree.flatMap((c) =>
-      // content_page entries are included so their permanent redirect is prerendered (a real 308).
+      // content_page and linked entries are included so their redirects are prerendered (a real 30x).
       c.subcategories.filter((s) => s.kind !== "view_all").map((s) => ({ category: c.slug, subcategory: s.slug })),
     ),
     { category: NO_MATCH_PARAM, subcategory: NO_MATCH_PARAM },

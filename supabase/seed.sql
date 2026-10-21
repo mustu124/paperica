@@ -690,13 +690,12 @@ cross join (values
 -- Delete these before launch (Admin → Products, or:
 --   delete from public.products where slug like 'placeholder-%';)
 
--- Gift Sets: note at the bottom of the page (Catalogue V3 §5). Designs are chosen on WhatsApp after ordering.
-update public.subcategories s
+-- GIFTS: note at the bottom of the gift sets page (Catalogue V3 §5). Designs are chosen on WhatsApp after ordering.
+update public.categories
 set footer_note = $n$A little note before you order ♡
 
 All our gift sets can be personalised to your preferences, subject to availability. Once you’ve placed your order, simply connect with us on WhatsApp to share your preferred designs for the journal, notepad and other available items in your gift set. We’ll help you put together a combination you’ll love.$n$
-from public.categories c
-where s.category_id = c.id and c.slug = 'gifts' and s.slug = 'gift-sets' and s.footer_note is null;
+where slug = 'gifts' and footer_note is null;
 
 -- ===========================================================================
 

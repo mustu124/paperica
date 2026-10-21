@@ -43,6 +43,7 @@ async function Categories() {
             slug: c.slug,
             showInMenu: c.show_in_menu,
             description: c.description ?? "",
+            footerNote: c.footer_note ?? "",
             imageUrl: c.image_url,
             features: (Array.isArray(c.menu_feature_images) ? (c.menu_feature_images as MenuFeatureImage[]) : []).map((f) => ({
               url: f.url,
@@ -53,7 +54,7 @@ async function Categories() {
           }}
           subcategories={(subs ?? [])
             .filter((s) => s.category_id === c.id)
-            .map((s) => ({ id: s.id, name: s.name, slug: s.slug, kind: s.kind, description: s.description ?? "", footerNote: s.footer_note ?? "" }))}
+            .map((s) => ({ id: s.id, name: s.name, slug: s.slug, kind: s.kind, description: s.description ?? "", footerNote: s.footer_note ?? "", linkUrl: s.link_url ?? "" }))}
         />
       ))}
     </div>

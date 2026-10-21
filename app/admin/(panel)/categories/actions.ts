@@ -19,6 +19,8 @@ const categoryInput = z.object({
   menu_feature_images: z
     .array(z.object({ url: z.string().max(1000), alt: z.string().trim().max(200), label: z.string().trim().max(80), link_url: linkOrPath }))
     .max(2),
+  /** Omitted = leave unchanged (keeps saving working before the gift-sets migration). */
+  footer_note: z.string().trim().max(2000).optional(),
 });
 
 /** Rename / show-hide / description / images for a menu head. (Heads can't be created or deleted.) */
@@ -36,6 +38,7 @@ export async function saveCategory(id: string, input: z.input<typeof categoryInp
       description: v.description || null,
       image_url: v.image_url,
       menu_feature_images: v.menu_feature_images.filter((m) => m.url),
+      ...(v.footer_note !== undefined ? { footer_note: v.footer_note || null } : {}),
     })
     .eq("id", id);
   if (error) return { ok: false, error: friendlyError(error) };
@@ -80,6 +83,8 @@ const subInput = z.object({
   description: z.string().trim().max(500),
   /** Omitted = leave unchanged (also keeps saving working before the gift-sets migration). */
   footer_note: z.string().trim().max(2000).optional(),
+  /** Menu item opens this page instead of a collection; omitted = unchanged. */
+  link_url: linkOrPath.optional(),
 });
 
 export async function saveSubcategory(id: string, input: z.input<typeof subInput>): Promise<ActionResult> {
@@ -93,6 +98,7 @@ export async function saveSubcategory(id: string, input: z.input<typeof subInput
       name: parsed.data.name,
       description: parsed.data.description || null,
       ...(parsed.data.footer_note !== undefined ? { footer_note: parsed.data.footer_note || null } : {}),
+      ...(parsed.data.link_url !== undefined ? { link_url: parsed.data.link_url || null } : {}),
     })
     .eq("id", id);
   if (error) return { ok: false, error: friendlyError(error) };

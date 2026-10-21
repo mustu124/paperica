@@ -25,17 +25,19 @@ function SubRow({
   isFirst,
   isLast,
 }: {
-  sub: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string };
+  sub: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string; linkUrl: string };
   isFirst: boolean;
   isLast: boolean;
 }) {
   const [name, setName] = useState(sub.name);
   const [description, setDescription] = useState(sub.description);
   const [footerNote, setFooterNote] = useState(sub.footerNote);
-  const [noteOpen, setNoteOpen] = useState(Boolean(sub.footerNote));
+  const [linkUrl, setLinkUrl] = useState(sub.linkUrl);
+  const [moreOpen, setMoreOpen] = useState(Boolean(sub.footerNote || sub.linkUrl));
   const { run, pending } = useSave();
   const noteDirty = footerNote !== sub.footerNote;
-  const dirty = name !== sub.name || description !== sub.description || noteDirty;
+  const linkDirty = linkUrl !== sub.linkUrl;
+  const dirty = name !== sub.name || description !== sub.description || noteDirty || linkDirty;
 
   return (
     <li className="grid gap-2 rounded-md bg-paper/40 p-3 md:grid-cols-[auto_1fr_1.4fr_auto] md:items-center">
@@ -62,7 +64,16 @@ function SubRow({
         <Button
           size="sm"
           disabled={!dirty || pending}
-          onClick={() => run(() => saveSubcategory(sub.id, { name, description, ...(noteDirty ? { footer_note: footerNote } : {}) }))}
+          onClick={() =>
+            run(() =>
+              saveSubcategory(sub.id, {
+                name,
+                description,
+                ...(noteDirty ? { footer_note: footerNote } : {}),
+                ...(linkDirty ? { link_url: linkUrl } : {}),
+              }),
+            )
+          }
         >
           Save
         </Button>
@@ -78,15 +89,21 @@ function SubRow({
           </button>
         )}
       </div>
-      {sub.kind !== "content_page" &&
-        (noteOpen ? (
-          <label className="flex flex-col gap-1 text-xs text-ink-muted md:col-span-4">
-            Note at the bottom of this page — first paragraph is the heading; a “Chat on WhatsApp” button is added. Leave empty for none.
-            <textarea rows={4} value={footerNote} onChange={(e) => setFooterNote(e.target.value)} className={`${inputCls} text-sm text-ink`} />
-          </label>
+      {sub.kind === "manual" &&
+        (moreOpen ? (
+          <div className="grid gap-3 md:col-span-4">
+            <label className="flex flex-col gap-1 text-xs text-ink-muted">
+              Opens this page instead (optional) — e.g. a product: /products/the-little-things-set. Leave empty to show this section&apos;s products.
+              <input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="/products/…" className={`${inputCls} py-1.5 text-sm text-ink`} />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-ink-muted">
+              Note at the bottom of this page — first paragraph is the heading; a “Chat on WhatsApp” button is added. Leave empty for none.
+              <textarea rows={4} value={footerNote} onChange={(e) => setFooterNote(e.target.value)} className={`${inputCls} text-sm text-ink`} />
+            </label>
+          </div>
         ) : (
-          <button type="button" onClick={() => setNoteOpen(true)} className="justify-self-start text-xs text-chilli underline underline-offset-4 md:col-span-4">
-            Add a note at the bottom of this page
+          <button type="button" onClick={() => setMoreOpen(true)} className="justify-self-start text-xs text-chilli underline underline-offset-4 md:col-span-4">
+            Link or note…
           </button>
         ))}
     </li>
@@ -99,14 +116,15 @@ export function CategoryEditor({
   isFirst,
   isLast,
 }: {
-  category: { id: string; name: string; slug: string; showInMenu: boolean; description: string; imageUrl: string | null; features: Feature[] };
-  subcategories: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string }[];
+  category: { id: string; name: string; slug: string; showInMenu: boolean; description: string; footerNote: string; imageUrl: string | null; features: Feature[] };
+  subcategories: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string; linkUrl: string }[];
   isFirst: boolean;
   isLast: boolean;
 }) {
   const [name, setName] = useState(category.name);
   const [show, setShow] = useState(category.showInMenu);
   const [description, setDescription] = useState(category.description);
+  const [footerNote, setFooterNote] = useState(category.footerNote);
   const [imageUrl, setImageUrl] = useState(category.imageUrl);
   const [features, setFeatures] = useState<Feature[]>(
     [0, 1].map((i) => category.features[i] ?? { url: "", alt: "", label: "", link_url: "" }),
@@ -145,6 +163,7 @@ export function CategoryEditor({
               description,
               image_url: imageUrl,
               menu_feature_images: features,
+              ...(footerNote !== category.footerNote ? { footer_note: footerNote } : {}),
             }),
           );
         }}
@@ -157,6 +176,9 @@ export function CategoryEditor({
             <Toggle checked={show} onChange={setShow} label="Show in the menu" />
             <Field label="Description (optional)" hint="Shown under the title on the collection page.">
               <textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Note at the bottom of the page (optional)" hint="First paragraph is the heading; a “Chat on WhatsApp” button is added.">
+              <textarea rows={4} value={footerNote} onChange={(e) => setFooterNote(e.target.value)} className={inputCls} />
             </Field>
           </div>
           <ImageUpload label="Collection image" folder="categories" value={imageUrl} onChange={setImageUrl} className="w-36" />

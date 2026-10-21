@@ -78,8 +78,10 @@ export type Database = {
           description: string | null;
           menu_feature_images: MenuFeatureImage[];
           default_mode: ProductMode;
+          /** Optional note at the bottom of the head's page (e.g. GIFTS). */
+          footer_note: string | null;
         },
-        "id" | "sort_order" | "show_in_menu" | "menu_feature_images" | "default_mode"
+        "id" | "sort_order" | "show_in_menu" | "menu_feature_images" | "default_mode" | "footer_note"
       >;
       subcategories: T<
         {
@@ -92,8 +94,10 @@ export type Database = {
           description: string | null;
           /** Optional note at the bottom of the collection page (e.g. Gift Sets). */
           footer_note: string | null;
+          /** Menu item that opens this page instead of a collection (e.g. /products/the-little-things-set). */
+          link_url: string | null;
         },
-        "id" | "sort_order" | "kind" | "description" | "footer_note"
+        "id" | "sort_order" | "kind" | "description" | "footer_note" | "link_url"
       >;
       products: T<
         {

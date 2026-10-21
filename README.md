@@ -116,7 +116,7 @@ Open Supabase → SQL Editor, and run each file in `supabase/migrations` in orde
 | `…000400_storage.sql` | Public-read `media` bucket (folders `products/`, `homepage/`, `categories/`, `pages/`); admin-only writes; images only, 10 MB max |
 | `20261019000500_branding.sql` | Adds the `branding/` upload folder, the `og_image_url` setting, and switches the footer image to the logo |
 | `20261019000700_mobile_images.sql` | Optional phone image per homepage image (`homepage_assets.mobile_image_url`), served with `<picture>` art direction (`components/ui/art-image.tsx`) |
-| `20261021000200_gift_sets.sql` | Gift sets: `product_bundle_items` (a set's contents = “qty × any product in a subcategory”); `refresh_bundle_stock()` + triggers keep each set's stock = lowest component stock minus units held by paid, undispatched gift-set orders; `subcategories.footer_note` (note under a collection, e.g. Gift Sets) |
+| `20261021000200_gift_sets.sql` | Gift sets: `product_bundle_items` (a set's contents = “qty × any product in a subcategory”); `refresh_bundle_stock()` + triggers keep each set's stock = lowest component stock minus units held by paid, undispatched gift-set orders; `categories/subcategories.footer_note` (note under a collection, e.g. GIFTS); `subcategories.link_url` (menu item that opens another page, e.g. each gift set's product page) |
 | `20261021000100_enquiry_forms.sql` | Guided WhatsApp quote forms on Custom Orders and Corporate Gifting (`pages.form_config`: formats and indicative prices, choices, small print; edited in Admin → Pages & FAQs); header logo switched to the original round logo |
 
 **Access rules (RLS):** the public can read active products (and their images, variants and

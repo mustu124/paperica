@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ProductGridSkeleton } from "@/components/site/product-grid";
@@ -69,6 +69,8 @@ export async function CollectionPage({
   const { category, subcategory } = nodes;
   // Corporate Gifting / Custom Orders live at their own top-level page.
   if (subcategory?.kind === "content_page") permanentRedirect(`/${subcategory.slug}`);
+  // Menu items that open another page (e.g. a gift set's product page).
+  if (subcategory?.linkUrl) redirect(subcategory.linkUrl);
 
   const title = displayTitle(nodes);
   const description = subcategory ? subcategory.description : category.description;
@@ -96,13 +98,15 @@ export async function CollectionPage({
         />
       </Suspense>
 
-      {subcategory?.footerNote && <FooterNote note={subcategory.footerNote} />}
+      {(subcategory ? subcategory.footerNote : category.footerNote) && (
+        <FooterNote note={(subcategory ? subcategory.footerNote : category.footerNote) as string} />
+      )}
     </div>
   );
 }
 
 /**
- * Note under the products (set per subcategory in Admin → Categories). The first paragraph is
+ * Note under the products (set per menu head or subcategory in Admin → Categories). The first paragraph is
  * the heading; a WhatsApp button follows when a number is set.
  */
 async function FooterNote({ note }: { note: string }) {

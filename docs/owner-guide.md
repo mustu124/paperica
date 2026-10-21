@@ -93,16 +93,22 @@ Dispatch and delivery times are on the same page, for example "4–6 business da
 
 ## Gift sets
 
-Gift sets are products in **GIFTS → Gift Sets**. Each one lists what's inside under **Gift set contents**, for example "1 × Notepad — any product in Paper Edit → Notepads". The customer picks the designs on WhatsApp after ordering, and the note at the bottom of the Gift Sets page tells them to.
+Each gift set is a product with its own item in the **GIFTS** menu, for example "The Little Things Set", which opens its product page. **View All** shows every set.
+
+Each set lists what's inside under **Gift set contents**, for example "1 × Notepad — any product in Paper Edit → Notepads". The customer picks the designs on WhatsApp after ordering, and the note at the bottom of the GIFTS page tells them to.
 
 - **Stock works itself out.** A set can be bought while there's enough of every item inside it. For example, with 2 notepads left in total, at most 2 sets that include a notepad can be bought.
 - **When a gift-set order comes in:**
   1. The order page lists what's inside the set. Agree the designs with the customer on WhatsApp.
   2. Before marking the order **Dispatched**, reduce the stock of the exact designs you packed (Products → each item). Until then, the paid order holds those items back.
 - **Price:** the set's own price is what the customer pays. Put the "individual retail total" in **Compare-at price** to show the saving.
-- **Adding a new set:** duplicate an existing set and change the name, price, photos and contents.
+- **Adding a new set:**
+  1. Duplicate an existing set and change the name, price, photos and contents.
+  2. In **Categories & Menu** → GIFTS, add a subcategory with the set's name.
+  3. Tap **Link or note…** and enter the set's page, for example `/products/the-little-things-set`.
+  4. Tick that subcategory on the set's product.
 
-To change the note at the bottom of the Gift Sets page, go to **Categories & Menu** → GIFTS → Gift Sets.
+To change the note at the bottom of the GIFTS page, go to **Categories & Menu** → GIFTS → **Note at the bottom of the page**.
 
 ---
 

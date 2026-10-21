@@ -26,8 +26,12 @@ export function categoryHref(categorySlug: string) {
   return `/collections/${categorySlug}`;
 }
 
-/** View All → the category; content pages (Corporate Gifting, Custom Orders) → their own page. */
-export function subcategoryHref(categorySlug: string, sub: { slug: string; kind: SubcategoryKind }) {
+/**
+ * View All → the category; content pages (Corporate Gifting, Custom Orders) → their own page;
+ * items with a link (e.g. a gift set) → that page.
+ */
+export function subcategoryHref(categorySlug: string, sub: { slug: string; kind: SubcategoryKind; link_url?: string | null }) {
+  if (sub.link_url) return sub.link_url;
   if (sub.kind === "view_all") return categoryHref(categorySlug);
   if (sub.kind === "content_page") return `/${sub.slug}`;
   return `/collections/${categorySlug}/${sub.slug}`;
@@ -46,7 +50,8 @@ export async function getMenu(): Promise<MenuCategory[]> {
       .select("id, name, slug, sort_order, image_url, menu_feature_images")
       .eq("show_in_menu", true)
       .order("sort_order"),
-    supabase.from("subcategories").select("id, category_id, name, slug, kind, sort_order").order("sort_order"),
+    // "*" so the menu still loads on a database without the link_url column yet.
+    supabase.from("subcategories").select("*").order("sort_order"),
   ]);
 
   if (cats.error || subs.error) {
