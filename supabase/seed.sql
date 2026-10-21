@@ -20,7 +20,7 @@ begin;
 
 insert into public.categories (name, slug, sort_order, show_in_menu, image_url, default_mode, menu_feature_images) values
   ('NEW IN', 'new-in', 1, true, '/placeholders/categories/new-in.svg', 'buy',
-   '[{"url":"/placeholders/products/placeholder-spiral-notebook-a5-1.svg","alt":"Replace me: placeholder spiral notebook","label":"New Collection","link_url":"/collections/new-in/new-collection"},
+   '[{"url":"/placeholders/products/placeholder-spiral-notebook-a5-1.svg","alt":"Replace me: placeholder spiral notebook","label":"New Collection","link_url":"/collections/new-in"},
      {"url":"/placeholders/products/placeholder-dot-grid-journal-1.svg","alt":"Replace me: placeholder dot grid journal","label":"Best Sellers","link_url":"/collections/new-in/best-sellers"}]'),
   ('NOTEBOOKS & JOURNALS', 'notebooks-journals', 2, true, '/placeholders/categories/notebooks-journals.svg', 'buy',
    '[{"url":"/placeholders/products/placeholder-dot-grid-journal-1.svg","alt":"Replace me: placeholder journal","label":"Journals","link_url":"/collections/notebooks-journals/journals"},
@@ -53,7 +53,6 @@ from (values
   ('new-in', 'View All',        'view-all',        1, 'view_all'),
   ('new-in', 'New Collection',  'new-collection',  2, 'filter_new'),
   ('new-in', 'Best Sellers',    'best-sellers',    3, 'filter_best'),
-  ('new-in', 'Snap-in Separators', 'snap-in-separators', 4, 'manual'),
 
   ('notebooks-journals', 'View All',               'view-all',               1, 'view_all'),
   ('notebooks-journals', 'Spiral-Bound Notebooks', 'spiral-bound-notebooks', 2, 'manual'),
@@ -94,7 +93,7 @@ on conflict (category_id, slug) do update set
 insert into public.site_settings (key, value) values
   ('brand_name',                      to_jsonb('Paperica'::text)),
   ('tagline',                         to_jsonb('All Things Paper'::text)),
-  ('announcement_bar_text',           to_jsonb('Delivering across India · Standard shipping ₹{{standard_shipping_fee_inr}} per order'::text)),
+  ('announcement_bar_text',           to_jsonb('Free shipping on orders above ₹{{free_shipping_threshold_inr}} | Delivering across India · Standard shipping ₹{{standard_shipping_fee_inr}} per order'::text)),
   ('announcement_bar_enabled',        'true'::jsonb),
   ('contact_email',                   to_jsonb('paperica26@gmail.com'::text)),
   ('whatsapp_number',                 to_jsonb('919769223863'::text)),
@@ -122,8 +121,8 @@ insert into public.site_settings (key, value) values
 <p>Founded in 2021, Paperica began with a love for colourful stationery and the desire to build something of my own. Over time, that love grew into a deeper appreciation for journalling, different kinds of paper and thoughtful design. The journey has taught me what goes into creating products and building a business, and Paperica continues to evolve with everything I learn and discover.</p>$h$::text)),
   ('mission_html',                    to_jsonb($h$<h2>Our Mission</h2>
 <p>Our mission is to bring more creativity and colour into everyday life through thoughtfully designed stationery. We want to make planning, journalling and putting pen to paper feel more personal and enjoyable, one page at a time.</p>$h$::text)),
-  ('free_shipping_threshold_inr',     'null'::jsonb),
-  ('hero_rotation_ms',                '1000'::jsonb),
+  ('free_shipping_threshold_inr',     '1500'::jsonb),
+  ('hero_rotation_ms',                '3000'::jsonb),
   ('cart_message',                    to_jsonb('Standard shipping of ₹{{standard_shipping_fee_inr}} per order is added at checkout.'::text)),
 
   -- Product page
@@ -157,7 +156,7 @@ Thank you for shopping with us!'::text)),
   ('order_thank_you_text',            to_jsonb('Thank you for your order! We have received it and will start preparing it with care.'::text)),
 
   -- Layout
-  ('logo_url',                        to_jsonb('/brand/paperica-logo-horizontal.png'::text)), -- header lockup
+  ('logo_url',                        to_jsonb('/brand/paperica-logo-trim.png'::text)),       -- header logo
   ('footer_illustration_url',         to_jsonb('/brand/paperica-logo-trim.png'::text)), -- footer logo
   ('og_image_url',                    to_jsonb('/brand/paperica-og.jpg'::text)),        -- link-preview image, 1200×630
   ('mobile_menu_links', $j$[
@@ -388,45 +387,62 @@ $h$),
 
 -- ---------------------------------------------------------------------------
 ('corporate-gifting', 'Corporate Gifting', $h$
-<h2>Thoughtful Stationery, Made for Your Brand</h2>
-<p>Make your gifting more personal with customised stationery from Paperica. From notebooks and planners to thoughtfully put-together stationery gifts, we work with businesses to explore options suited to their brand, occasion and budget.</p>
+<h2>Thoughtful gifts. Made for your brand.</h2>
+<p>Make a lasting impression with corporate gifts customised around your brand. From branded stationery and everyday essentials to curated gift hampers, Paperica helps bring corporate gifting ideas to life for employee welcome kits, client appreciation, milestones, events and special occasions.</p>
 
-<h2>Corporate Gifting</h2>
-<p>Whether you’re welcoming a team, thanking clients, planning an event or creating gifts for a special occasion, we can help you explore stationery options that fit your requirements. Customisation and branding options depend on selected products, design requirements and order quantity.</p>
-
-<h2>How to Enquire</h2>
-<p>To help us understand your requirements, please share:</p>
+<h2>Possible product categories</h2>
+<h3>Branded stationery</h3>
 <ul>
-  <li>Company or organisation name.</li>
-  <li>Occasion or purpose of the order.</li>
-  <li>Estimated quantity.</li>
-  <li>Budget per gift or overall budget.</li>
-  <li>Branding or personalisation requirements.</li>
-  <li>Preferred delivery date and destination.</li>
+  <li>Notebooks and journals</li>
+  <li>Pens</li>
+  <li>Letterheads and envelopes</li>
+  <li>Planners and notepads</li>
 </ul>
-<p>Contact us at <a href="mailto:{{contact_email}}"><strong>{{contact_email}}</strong></a> or via WhatsApp at <a href="{{whatsapp_url}}"><strong>{{whatsapp_number}}</strong></a>. We’ll discuss the options and communicate pricing and the estimated timeline before confirming the order.</p>
+<h3>Lifestyle and everyday essentials</h3>
+<ul>
+  <li>Candles with customised branding</li>
+  <li>Metal and insulated drinkware, including metal bottles</li>
+  <li>Other selected merchandise, subject to availability and feasibility</li>
+</ul>
+<h3>Curated corporate gift sets</h3>
+<ul>
+  <li>Employee welcome kits</li>
+  <li>Client appreciation gifts</li>
+  <li>Event and conference giveaways</li>
+  <li>Festive and occasion-based hampers</li>
+  <li>Bespoke gift boxes combining multiple products</li>
+</ul>
+
+<h2>Customised around your brand</h2>
+<p>Depending on the selected products, customisation may include company logos, brand colours, personalised messaging and custom packaging. Product selection, branding, quantity and packaging are discussed individually.</p>
+
+<h2>Tell us what you need</h2>
+<p>Share a few details below and send them to us on WhatsApp. We’ll discuss feasibility, timelines and a quotation with you directly.</p>
 $h$),
 
 -- ---------------------------------------------------------------------------
 ('custom-orders', 'Custom Orders', $h$
-<h2>Custom Orders</h2>
-<p>Have a specific idea in mind? Tell us what you’re looking for, and we’ll discuss available products, personalisation options, quantities, pricing and estimated production timeline before confirming your order.</p>
+<h2>Create Something That’s Yours</h2>
+<p>Your ideas, your style, your Paperica. Create stationery that feels uniquely yours by choosing a binding, cover direction and inside-page layout to suit the way you plan, write and create.</p>
 
-<h2>Personalised Orders</h2>
-<p>Looking for a notebook or planner customised just for you? Contact us with your requirements, preferred design and personalisation details. We’ll discuss possibilities, pricing and the estimated timeline before confirming your order.</p>
-<p><strong>For personalised order enquiries, contact us on WhatsApp.</strong></p>
-
-<h2>How to Enquire</h2>
-<p>To help us understand your requirements, please share:</p>
+<h2>Base price includes</h2>
 <ul>
-  <li>Company or organisation name.</li>
-  <li>Occasion or purpose of the order.</li>
-  <li>Estimated quantity.</li>
-  <li>Budget per gift or overall budget.</li>
-  <li>Branding or personalisation requirements.</li>
-  <li>Preferred delivery date and destination.</li>
+  <li>Basic cover illustration.</li>
+  <li>Selected binding: Golden Wiro for Wiro formats or Perfect Binding for Perfect Binding formats, with the chosen hardbound or softbound style.</li>
+  <li>100 pages of 100 GSM paper.</li>
+  <li>Choice of ruled, plain, dotted or grid pages.</li>
 </ul>
-<p>Contact us at <a href="mailto:{{contact_email}}"><strong>{{contact_email}}</strong></a> or via WhatsApp at <a href="{{whatsapp_url}}"><strong>{{whatsapp_number}}</strong></a>. We’ll discuss the options and communicate pricing and the estimated timeline before confirming the order.</p>
+
+<h2>Additional charges apply</h2>
+<ul>
+  <li>Gold foiling on the cover.</li>
+  <li>More elaborate or complex cover illustrations beyond the basic illustration included.</li>
+  <li>Colourful separators inside the notebook.</li>
+  <li>Custom planner layouts or other specialised inside-page designs.</li>
+</ul>
+
+<h2>Get your quote</h2>
+<p>Choose your format, cover preference, inside pages and any extras below, then send your brief to us on WhatsApp. We’ll confirm feasibility and your final price.</p>
 $h$),
 
 -- ---------------------------------------------------------------------------
@@ -470,30 +486,27 @@ on conflict (slug) do nothing;
 update public.pages set effective_date = '2026-10-15'
 where slug in ('privacy-policy', 'terms-and-conditions') and effective_date is null;
 
-update public.pages set cta_label = 'Enquire About Corporate Gifting' where slug = 'corporate-gifting' and cta_label is null;
-update public.pages set cta_label = 'Enquire About a Custom Order'   where slug = 'custom-orders' and cta_label is null;
+-- WhatsApp quote forms on the custom order and corporate gifting pages (Catalogue V3 §6–7).
+-- cta_whatsapp_message is the first line of the message; the form adds the customer's answers.
+update public.pages set cta_label = 'Discuss Your Corporate Gifting Requirements' where slug = 'corporate-gifting' and cta_label is null;
+update public.pages set cta_label = 'Get My Quote on WhatsApp' where slug = 'custom-orders' and cta_label is null;
 
--- "Enquire on WhatsApp" / "Email us" buttons on the corporate gifting and custom order pages.
 update public.pages set
-  cta_whatsapp_message = E'Hi Paperica! I''d like to enquire about corporate gifting.
-Company or organisation name: 
-Occasion or purpose: 
-Estimated quantity: 
-Budget (per gift or overall): 
-Branding or personalisation requirements: 
-Preferred delivery date: 
-Delivery destination: ',
+  cta_whatsapp_message = 'Hi Paperica! I’d like to discuss corporate gifting for our company.',
   cta_email_subject = 'Corporate gifting enquiry'
 where slug = 'corporate-gifting' and cta_whatsapp_message is null;
 
 update public.pages set
-  cta_whatsapp_message = E'Hi Paperica! I''d like to discuss a custom order.
-What I''m looking for: 
-Quantity: 
-Personalisation text/design: 
-Preferred delivery date: ',
+  cta_whatsapp_message = 'Hi Paperica! I’d like a quote for a custom order.',
   cta_email_subject = 'Custom order enquiry'
 where slug = 'custom-orders' and cta_whatsapp_message is null;
+
+-- Form choices and indicative prices (Admin → Pages & FAQs → the page → Form options).
+update public.pages set form_config = '{"form": "custom_order", "formats": [{"label": "Softbound Wiro", "price": 899}, {"label": "Hardbound Wiro", "price": 1299}, {"label": "Softbound Perfect Binding", "price": 899}, {"label": "Hardbound Perfect Binding", "price": 2299}, {"label": "Custom Photo Book", "price": 2500, "photo_book": true}], "page_types": [{"label": "Ruled"}, {"label": "Plain"}, {"label": "Dotted"}, {"label": "Grid"}, {"label": "Planner layout", "extra": true}], "extras": [{"label": "Gold foiling on the cover", "extra": true}, {"label": "Colourful separators inside the notebook", "extra": true}], "extra_label": "Additional charges apply — final quote via WhatsApp", "note": "Sending this form isn’t an order confirmation. We’ll confirm feasibility and your final price on WhatsApp before anything is made."}'::jsonb
+where slug = 'custom-orders' and form_config = '{}'::jsonb;
+
+update public.pages set form_config = '{"form": "corporate", "gifting_types": [{"label": "Employee gifts"}, {"label": "Client gifts"}, {"label": "Events"}, {"label": "Festive gifting"}, {"label": "Welcome kits"}, {"label": "Other"}], "products": [{"label": "Notebooks"}, {"label": "Pens"}, {"label": "Candles"}, {"label": "Drinkware"}, {"label": "Letterheads / envelopes"}, {"label": "Gift hampers"}, {"label": "Other"}], "note": "The button opens WhatsApp with your enquiry filled in — just tap Send. We’ll discuss feasibility, timelines and a quotation with you directly."}'::jsonb
+where slug = 'corporate-gifting' and form_config = '{}'::jsonb;
 
 -- ===========================================================================
 -- FAQs (grouped exactly as in the handover)
@@ -614,7 +627,7 @@ with hp as (
     ('promo_duo', 30, null, 1, 1, '/placeholders/homepage/promo-duo/promo-duo-2b.svg', 'Replace me: placeholder promo image alternate', null, null, null, null, null),
 
     -- PRODUCT MOSAIC
-    ('product_mosaic', 40, '{"heading": "The New Collection", "view_all_url": "/collections/new-in/new-collection", "product_slugs": [], "tile_tone": "blush"}', 0, 0, '/placeholders/homepage/mosaic/mosaic-1a.svg', 'Replace me: placeholder lifestyle image', '/collections/notebooks-journals',
+    ('product_mosaic', 40, '{"heading": "The New Collection", "view_all_url": "/collections/new-in", "product_slugs": [], "tile_tone": "blush"}', 0, 0, '/placeholders/homepage/mosaic/mosaic-1a.svg', 'Replace me: placeholder lifestyle image', '/collections/notebooks-journals',
        'A notebook for every kind of day', null, null, null),
     ('product_mosaic', 40, null, 0, 1, '/placeholders/homepage/mosaic/mosaic-2a.svg', 'Replace me: placeholder lifestyle image', null, null, null, null, null),
 

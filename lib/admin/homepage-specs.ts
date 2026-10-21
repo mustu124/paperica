@@ -77,7 +77,7 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
         ],
       },
     ],
-    settings: [{ key: "hero_rotation_ms", label: "Image swap speed (milliseconds)", type: "number", min: 500, hint: "1000 = every second. Used by the hero and promo banners." }],
+    settings: [{ key: "hero_rotation_ms", label: "Image swap speed (milliseconds)", type: "number", min: 500, hint: "3000 = every 3 seconds. Used by the hero and promo banners." }],
     reorderable: true,
   },
   collection_carousel: {
@@ -128,8 +128,8 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
     ],
     config: [
       { key: "heading", label: "Section heading (optional)", type: "text", hint: "e.g. The New Collection" },
-      { key: "view_all_url", label: "“View all” link (optional)", type: "text", hint: "e.g. /collections/new-in/new-collection" },
-      { key: "product_slugs", label: "Products", type: "products", max: 8, hint: "Pick up to 8 in order. Pick none to show the 8 newest automatically." },
+      { key: "view_all_url", label: "“View all” link (optional)", type: "text", hint: "e.g. /collections/new-in" },
+      { key: "product_slugs", label: "Products", type: "products", max: 8, hint: "Pick up to 8 in order. Pick none to show the newest products marked New." },
       {
         key: "tile_tone",
         label: "Product tile background",

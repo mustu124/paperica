@@ -21,11 +21,11 @@ function Logo({ settings }: { settings: SiteSettings }) {
         <Image
           src={logo}
           alt={alt}
-          width={700}
-          height={266}
+          width={480}
+          height={482}
           priority
-          sizes="(min-width: 1024px) 240px, 140px"
-          className="h-12 w-auto transition-[height] duration-300 group-data-[scrolled=true]:h-10 lg:h-[4.75rem] lg:group-data-[scrolled=true]:h-14"
+          sizes="(min-width: 1024px) 112px, 64px"
+          className="h-16 w-auto transition-[height] duration-300 group-data-[scrolled=true]:h-12 lg:h-28 lg:group-data-[scrolled=true]:h-16"
         />
       ) : (
         <span className="font-display text-3xl text-chilli lg:text-4xl">{brand}</span>

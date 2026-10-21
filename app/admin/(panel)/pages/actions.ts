@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { friendlyError, NOT_AUTHORISED, requireAdmin, type ActionResult } from "@/lib/admin/auth";
 import { EDITABLE_PAGES } from "@/lib/admin/tokens";
+import { formConfig } from "@/lib/enquiry-forms";
 import { refreshTags } from "@/lib/revalidate";
 
 const html = z.string().max(100_000);
@@ -15,6 +16,8 @@ const pageInput = z.object({
   cta_label: z.string().trim().max(80),
   cta_whatsapp_message: z.string().max(2000),
   cta_email_subject: z.string().trim().max(150),
+  /** Guided enquiry form; null leaves the stored form unchanged. */
+  form_config: z.unknown().nullable().optional(),
 });
 
 export async function savePage(slug: string, input: z.input<typeof pageInput>): Promise<ActionResult> {
@@ -25,6 +28,12 @@ export async function savePage(slug: string, input: z.input<typeof pageInput>): 
   const parsed = pageInput.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Please check the form." };
   const v = parsed.data;
+  let form_config: z.infer<typeof formConfig> | undefined;
+  if (page.enquiry && v.form_config != null) {
+    const form = formConfig.safeParse(v.form_config);
+    if (!form.success) return { ok: false, error: "Please check the form options." };
+    form_config = form.data;
+  }
 
   const { error } = await admin.supabase
     .from("pages")
@@ -37,6 +46,7 @@ export async function savePage(slug: string, input: z.input<typeof pageInput>): 
             cta_label: v.cta_label || null,
             cta_whatsapp_message: v.cta_whatsapp_message.trim() ? v.cta_whatsapp_message : null,
             cta_email_subject: v.cta_email_subject || null,
+            ...(form_config ? { form_config } : {}),
           }
         : {}),
     })

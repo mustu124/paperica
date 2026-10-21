@@ -8,6 +8,7 @@ import { Card, Field, inputCls } from "@/components/admin/ui";
 import { useSave } from "@/components/admin/use-save";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { optionsToText, textToOptions, type FormConfig } from "@/lib/enquiry-forms";
 import { saveAbout, savePage } from "../actions";
 
 type Token = { token: string; meaning: string; value: string };
@@ -70,6 +71,40 @@ function Shell({ title, path, tokens, children, pending }: { title: string; path
   );
 }
 
+type FormField = { key: string; label: string; rows: number; hint?: string; wide?: boolean; list?: boolean };
+const FORM_FIELDS: Record<FormConfig["form"], FormField[]> = {
+  custom_order: [
+    { key: "formats", label: "Formats and indicative prices (₹)", rows: 6, list: true, wide: true, hint: "e.g. Custom Photo Book | 2500 | photo book" },
+    { key: "page_types", label: "Inside-page choices", rows: 6, list: true, hint: "e.g. Planner layout | extra" },
+    { key: "extras", label: "Extras (asked Yes / No)", rows: 6, list: true, hint: "e.g. Gold foiling on the cover | extra" },
+    { key: "extra_label", label: "Additional-charges note", rows: 1, wide: true },
+    { key: "note", label: "Small print under the form", rows: 2, wide: true },
+  ],
+  corporate: [
+    { key: "gifting_types", label: "Types of gifting", rows: 7, list: true },
+    { key: "products", label: "Products of interest", rows: 7, list: true },
+    { key: "note", label: "Small print under the form", rows: 2, wide: true },
+  ],
+};
+
+function formToText(form: FormConfig | null): Record<string, string> {
+  if (!form) return {};
+  const values = form as unknown as Record<string, unknown>;
+  return Object.fromEntries(
+    FORM_FIELDS[form.form].map((f) => [
+      f.key,
+      f.list ? optionsToText((values[f.key] as Parameters<typeof optionsToText>[0]) ?? []) : String(values[f.key] ?? ""),
+    ]),
+  );
+}
+
+function textToForm(kind: FormConfig["form"], text: Record<string, string>) {
+  return {
+    form: kind,
+    ...Object.fromEntries(FORM_FIELDS[kind].map((f) => [f.key, f.list ? textToOptions(text[f.key] ?? "") : (text[f.key] ?? "").trim()])),
+  };
+}
+
 export function PageForm({
   slug,
   label,
@@ -77,6 +112,7 @@ export function PageForm({
   enquiry,
   tokens,
   initial,
+  form,
 }: {
   slug: string;
   label: string;
@@ -84,16 +120,20 @@ export function PageForm({
   enquiry: boolean;
   tokens: Token[];
   initial: { title: string; body_html: string; effective_date: string | null; cta_label: string; cta_whatsapp_message: string; cta_email_subject: string };
+  /** The page's guided enquiry form (Custom Orders / Corporate Gifting), if it has one. */
+  form: FormConfig | null;
 }) {
   const [v, setV] = useState(initial);
+  const [formText, setFormText] = useState(() => formToText(form));
   const { run, pending } = useSave();
   const set = <K extends keyof typeof v>(k: K, value: (typeof v)[K]) => setV((s) => ({ ...s, [k]: value }));
+  const setForm = (k: string, value: string) => setFormText((s) => ({ ...s, [k]: value }));
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        void run(() => savePage(slug, v), "Page saved");
+        void run(() => savePage(slug, { ...v, form_config: form ? textToForm(form.form, formText) : null }), "Page saved");
       }}
     >
       <Shell title={label} path={path} tokens={tokens} pending={pending}>
@@ -108,17 +148,42 @@ export function PageForm({
           </div>
         </Card>
         {enquiry && (
-          <Card title="Enquiry buttons" description="The big WhatsApp button and the Email button on this page.">
+          <Card
+            title={form ? "WhatsApp button" : "Enquiry buttons"}
+            description={form ? "The button under the form. It opens WhatsApp with the customer's answers filled in." : "The big WhatsApp button and the Email button on this page."}
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="WhatsApp button label">
                 <input value={v.cta_label} onChange={(e) => set("cta_label", e.target.value)} placeholder="Enquire on WhatsApp" className={inputCls} />
               </Field>
-              <Field label="Email subject">
+              <Field label="Email subject" hint={form ? "For the “Prefer email?” link under the form." : undefined}>
                 <input value={v.cta_email_subject} onChange={(e) => set("cta_email_subject", e.target.value)} className={inputCls} />
               </Field>
-              <Field label="Pre-filled WhatsApp message" className="sm:col-span-2">
-                <textarea rows={6} value={v.cta_whatsapp_message} onChange={(e) => set("cta_whatsapp_message", e.target.value)} className={inputCls} />
+              <Field
+                label={form ? "First line of the WhatsApp message" : "Pre-filled WhatsApp message"}
+                hint={form ? "The customer's answers are added underneath." : undefined}
+                className="sm:col-span-2"
+              >
+                <textarea rows={form ? 2 : 6} value={v.cta_whatsapp_message} onChange={(e) => set("cta_whatsapp_message", e.target.value)} className={inputCls} />
               </Field>
+            </div>
+          </Card>
+        )}
+        {form && (
+          <Card
+            title="Form options"
+            description="One choice per line. Add details after a “|”: a price (e.g. Softbound Wiro | 899), “extra” to show the additional-charges note, or “photo book” for a format that asks for the photo book brief."
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              {FORM_FIELDS[form.form].map((f) => (
+                <Field key={f.key} label={f.label} hint={f.hint} className={f.wide ? "sm:col-span-2" : undefined}>
+                  {f.rows === 1 ? (
+                    <input value={formText[f.key] ?? ""} onChange={(e) => setForm(f.key, e.target.value)} className={inputCls} />
+                  ) : (
+                    <textarea rows={f.rows} value={formText[f.key] ?? ""} onChange={(e) => setForm(f.key, e.target.value)} className={inputCls} />
+                  )}
+                </Field>
+              ))}
             </div>
           </Card>
         )}

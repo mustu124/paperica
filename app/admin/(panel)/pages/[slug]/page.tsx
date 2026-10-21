@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { requireAdmin } from "@/lib/admin/auth";
 import { EDITABLE_PAGES, TOKEN_HELP } from "@/lib/admin/tokens";
 import { renderTokensText } from "@/lib/content";
+import { parseFormConfig } from "@/lib/enquiry-forms";
 import { AboutForm, PageForm } from "./page-form";
 
 export const metadata: Metadata = { title: "Edit page" };
@@ -65,6 +66,7 @@ async function Editor({ params }: Props) {
         cta_whatsapp_message: page.cta_whatsapp_message ?? "",
         cta_email_subject: page.cta_email_subject ?? "",
       }}
+      form={meta.enquiry ? parseFormConfig(page.form_config) : null}
     />
   );
 }

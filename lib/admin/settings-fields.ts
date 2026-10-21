@@ -17,7 +17,7 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
     title: "Branding & sharing",
     description: "PNG with a transparent background works best for logos.",
     fields: [
-      { key: "logo_url", label: "Header logo", type: "image", aspect: "aspect-[700/266]" },
+      { key: "logo_url", label: "Header logo", type: "image", aspect: "aspect-square" },
       { key: "footer_illustration_url", label: "Footer logo", type: "image", aspect: "aspect-square" },
       {
         key: "og_image_url",
@@ -81,7 +81,7 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
   {
     title: "Homepage & footer",
     fields: [
-      { key: "hero_rotation_ms", label: "Hero image swap speed (milliseconds)", type: "number", hint: "1000 = every second." },
+      { key: "hero_rotation_ms", label: "Hero image swap speed (milliseconds)", type: "number", hint: "3000 = every 3 seconds." },
       { key: "footer_about_blurb", label: "Footer “About” blurb", type: "textarea" },
     ],
   },

@@ -1,18 +1,22 @@
 import { notFound } from "next/navigation";
 import { resolveSubcategory } from "@/lib/collections";
-import { renderTokens } from "@/lib/content";
+import { renderTokens, renderTokensText } from "@/lib/content";
 import { getCategoryTree } from "@/lib/data/categories";
 import { getPage } from "@/lib/data/pages";
 import { getCatalog, getProductCards } from "@/lib/data/products";
 import { getSiteSettings } from "@/lib/data/settings";
+import { parseFormConfig } from "@/lib/enquiry-forms";
 import { titleCase } from "@/lib/format";
+import { settingString } from "@/lib/settings";
 import { EnquiryButtons } from "../enquiry-buttons";
 import { ProductGrid } from "../product-grid";
 import { ContentShell, Prose } from "./content-shell";
+import { CorporateForm, CustomOrderForm } from "./quote-forms";
 
 /**
- * Corporate Gifting / Custom Orders: page copy with a prominent WhatsApp enquiry CTA (+ email)
- * above and below, then any products tagged to the matching content subcategory.
+ * Corporate Gifting / Custom Orders: page copy, then the guided quote form from
+ * pages.form_config (sent on WhatsApp) — or, without a form, WhatsApp/email buttons above and
+ * below the copy. Then any products tagged to the matching content subcategory.
  */
 export async function EnquiryPage({ slug }: { slug: string }) {
   const [page, settings, tree, catalog] = await Promise.all([
@@ -43,6 +47,15 @@ export async function EnquiryPage({ slug }: { slug: string }) {
     emailSubject: page.cta_email_subject,
   };
 
+  const form = parseFormConfig(page.form_config);
+  const formProps = {
+    whatsappNumber: settingString(settings, "whatsapp_number"),
+    intro: page.cta_whatsapp_message ? renderTokensText(page.cta_whatsapp_message, settings) : "",
+    ctaLabel: page.cta_label ?? "",
+  };
+  const email = settingString(settings, "contact_email");
+  const mailto = `mailto:${email}${page.cta_email_subject ? `?subject=${encodeURIComponent(page.cta_email_subject)}` : ""}`;
+
   return (
     <>
       <ContentShell
@@ -53,9 +66,33 @@ export async function EnquiryPage({ slug }: { slug: string }) {
           { label: page.title },
         ]}
       >
-        <EnquiryButtons {...cta} className="mb-10" />
-        <Prose html={renderTokens(page.body_html, settings)} />
-        <EnquiryButtons {...cta} className="mt-10 border-t border-taupe pt-8" />
+        {form ? (
+          <>
+            <Prose html={renderTokens(page.body_html, settings)} />
+            <section id="quote" aria-label="Enquiry form" className="mt-12 scroll-mt-32 border border-taupe bg-white/70 p-5 md:p-8">
+              {form.form === "custom_order" ? (
+                <CustomOrderForm config={form} {...formProps} />
+              ) : (
+                <CorporateForm config={form} {...formProps} />
+              )}
+            </section>
+            {email && (
+              <p className="mt-6 text-sm text-ink-muted">
+                Prefer email? Write to{" "}
+                <a href={mailto} className="font-medium text-chilli underline underline-offset-4">
+                  {email}
+                </a>
+                .
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <EnquiryButtons {...cta} className="mb-10" />
+            <Prose html={renderTokens(page.body_html, settings)} />
+            <EnquiryButtons {...cta} className="mt-10 border-t border-taupe pt-8" />
+          </>
+        )}
       </ContentShell>
 
       {products.length > 0 && (

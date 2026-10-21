@@ -156,9 +156,11 @@ export type Database = {
           cta_email_subject: string | null;
           cta_label: string | null;
           effective_date: string | null;
+          /** Guided enquiry form (Custom Orders / Corporate Gifting); see lib/enquiry-forms.ts. */
+          form_config: Json;
           updated_at: string;
         },
-        "body_html" | "updated_at"
+        "body_html" | "form_config" | "updated_at"
       >;
       faqs: T<
         {

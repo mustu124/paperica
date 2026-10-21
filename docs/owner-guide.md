@@ -113,6 +113,22 @@ FAQs are on the same screen. You can add, edit, hide or reorder them.
 
 ---
 
+## Custom Orders and Corporate Gifting forms
+
+Both pages end with a short form. When a customer taps the button, WhatsApp opens with their answers already typed in. They tap Send, and you reply with the final quote. Nothing is paid online, and the form isn't an order.
+
+To change the choices or the indicative prices:
+
+1. Go to **Pages & FAQs** → **Custom Orders** (or **Corporate Gifting**).
+2. In **Form options**, put one choice on each line. Anything after a **|** adds a detail:
+   - a price: `Softbound Wiro | 899`
+   - `extra` to show the "Additional charges apply" note: `Planner layout | extra`
+   - `photo book` for a format that asks about photos instead of cover and pages: `Custom Photo Book | 2500 | photo book`
+3. **WhatsApp button** sets the button text and the first line of the message.
+4. Tap **Save page**.
+
+---
+
 ## Mark an order as dispatched and add tracking
 
 1. Go to **Orders**. Paid orders are under **Confirmed (paid)**. Tap the order number.

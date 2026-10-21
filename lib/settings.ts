@@ -6,7 +6,7 @@ export type SiteSettings = Record<string, unknown>;
 export type NavLink = { label: string; href: string };
 
 /** Logo files bundled with the site, used until Admin → Site Settings → Branding has one. */
-export const BUNDLED_LOGO = "/brand/paperica-logo-horizontal.png";
+export const BUNDLED_LOGO = "/brand/paperica-logo-trim.png";
 export const BUNDLED_ROUND_LOGO = "/brand/paperica-logo-trim.png";
 
 export type FooterConfig = {

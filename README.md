@@ -41,8 +41,7 @@ Generated from `brand/Paperica logo (3).png` (transparent) and `brand/Paperica l
 
 | File | Use |
 | --- | --- |
-| `public/brand/paperica-logo-horizontal.png` | Header logo (default `logo_url`): chilli + “ALL THINGS PAPER” + PAPERICA, rendered from the logo PDF's own lettering (EFCO Brookshire / Canva Sans, logo red #BF0003). The fonts themselves are not shipped. |
-| `public/brand/paperica-logo-trim.png` | Round logo: footer and Instagram avatar (default `footer_illustration_url`) |
+| `public/brand/paperica-logo-trim.png` | The original round logo, trimmed: header (default `logo_url`), footer and Instagram avatar (default `footer_illustration_url`) |
 | `public/brand/paperica-logo.png` | Full-size transparent logo (styleguide, print) |
 | `public/brand/paperica-logo-pink.png` | Pink-background logo, 1600×1600, for social profiles |
 | `public/brand/paperica-og.jpg` | Default link-preview (OpenGraph/Twitter) image, 1200×630 (default `og_image_url`) |
@@ -117,6 +116,7 @@ Open Supabase → SQL Editor, and run each file in `supabase/migrations` in orde
 | `…000400_storage.sql` | Public-read `media` bucket (folders `products/`, `homepage/`, `categories/`, `pages/`); admin-only writes; images only, 10 MB max |
 | `20261019000500_branding.sql` | Adds the `branding/` upload folder, the `og_image_url` setting, and switches the footer image to the logo |
 | `20261019000700_mobile_images.sql` | Optional phone image per homepage image (`homepage_assets.mobile_image_url`), served with `<picture>` art direction (`components/ui/art-image.tsx`) |
+| `20261021000100_enquiry_forms.sql` | Guided WhatsApp quote forms on Custom Orders and Corporate Gifting (`pages.form_config`: formats and indicative prices, choices, small print; edited in Admin → Pages & FAQs); header logo switched to the original round logo |
 
 **Access rules (RLS):** the public can read active products (and their images, variants and
 placements), categories, subcategories, settings, pages, active FAQs and active homepage

@@ -175,10 +175,13 @@ export async function getProductCardsBySlugs(slugs: string[]): Promise<ProductCa
   return getProductCards(slugs.flatMap((s) => bySlug.get(s) ?? []));
 }
 
-/** Most recently added active products. */
-export async function getLatestProducts(limit = 8): Promise<ProductCardData[]> {
+/** Active products marked New, most recently added first. */
+export async function getNewProducts(limit = 8): Promise<ProductCardData[]> {
   const { products } = await getCatalog();
-  const latest = [...products].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, limit);
+  const latest = products
+    .filter((p) => p.isNew)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, limit);
   return getProductCards(latest.map((p) => p.id));
 }
 

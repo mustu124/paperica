@@ -7,7 +7,7 @@ import { PromoDuo } from "@/components/site/home/promo-duo";
 import { PromoTrio } from "@/components/site/home/promo-trio";
 import { getHomepageSections, type HomepageSection } from "@/lib/data/homepage";
 import { getMenu } from "@/lib/data/menu";
-import { getLatestProducts, getProductCardsBySlugs } from "@/lib/data/products";
+import { getNewProducts, getProductCardsBySlugs } from "@/lib/data/products";
 import { getSiteSettings } from "@/lib/data/settings";
 import { settingNumber, settingString, type SiteSettings } from "@/lib/settings";
 
@@ -25,7 +25,7 @@ async function mosaicProducts(section: HomepageSection) {
   const slugs = Array.isArray(section.config.product_slugs)
     ? section.config.product_slugs.filter((s): s is string => typeof s === "string")
     : [];
-  return slugs.length > 0 ? getProductCardsBySlugs(slugs) : getLatestProducts(8);
+  return slugs.length > 0 ? getProductCardsBySlugs(slugs) : getNewProducts(8);
 }
 
 async function Section({
@@ -60,7 +60,7 @@ async function Section({
 
 export default async function HomePage() {
   const [settings, sections, menu] = await Promise.all([getSiteSettings(), getHomepageSections(), getMenu()]);
-  const intervalMs = settingNumber(settings, "hero_rotation_ms") ?? 1000;
+  const intervalMs = settingNumber(settings, "hero_rotation_ms") ?? 3000;
   const brand = settingString(settings, "brand_name");
   const tagline = settingString(settings, "tagline");
 
