@@ -154,6 +154,17 @@ FAQs are on the same screen. You can add, edit, hide or reorder them.
 
 ---
 
+## PERSONALISED
+
+The menu is Custom Notebooks · Custom Planners · Custom Photo Books · Custom Stationery · Corporate Gifting.
+
+- **Products:** each item is a **Customise on WhatsApp** product. A price shows as "From ₹…". Leave the price empty to show "Enquire for price", as the Photo Book does until its price is confirmed.
+- **The note under Custom Notebooks** lists what costs extra and links to the step-by-step quote form. To edit it, go to **Categories & Menu** → PERSONALISED → Custom Notebooks → **Link or note…**.
+  - Write a link as `[words](/page)`.
+- **Corporate Gifting photos:** change them under **Pages & FAQs** → Corporate Gifting → **Photos**.
+
+---
+
 ## Custom Orders and Corporate Gifting forms
 
 Both pages end with a short form. When a customer taps the button, WhatsApp opens with their answers already typed in. They tap Send, and you reply with the final quote. Nothing is paid online, and the form isn't an order.

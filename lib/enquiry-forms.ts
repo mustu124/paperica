@@ -26,6 +26,13 @@ const option = z.object({
 const options = z.array(option).max(30).catch([]);
 const text = (max: number) => z.string().max(max).catch("");
 
+/** Photos shown above the form (e.g. Corporate Gifting examples). */
+export type GalleryImage = { url: string; alt: string; caption: string };
+const gallery = z
+  .array(z.object({ url: z.string().min(1).max(1000), alt: z.string().max(200).catch(""), caption: z.string().max(120).catch("") }))
+  .max(12)
+  .catch([]);
+
 export const customOrderConfig = z.object({
   form: z.literal("custom_order"),
   formats: options,
@@ -35,6 +42,7 @@ export const customOrderConfig = z.object({
   extra_label: text(200),
   /** Small print under the form (e.g. "not an order confirmation"). */
   note: text(500),
+  gallery,
 });
 export type CustomOrderConfig = z.infer<typeof customOrderConfig>;
 
@@ -43,6 +51,7 @@ export const corporateConfig = z.object({
   gifting_types: options,
   products: options,
   note: text(500),
+  gallery,
 });
 export type CorporateConfig = z.infer<typeof corporateConfig>;
 

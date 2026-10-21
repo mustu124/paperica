@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
@@ -105,6 +106,20 @@ export async function CollectionPage({
   );
 }
 
+/** "[Build your quote](/custom-orders)" in a note becomes a link (site paths and https only). */
+function withLinks(text: string) {
+  return text.split(/(\[[^\]]+\]\((?:\/|https:\/\/)[^)\s]*\))/g).map((part, i) => {
+    const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    return m ? (
+      <Link key={i} href={m[2]} className="font-medium text-chilli underline underline-offset-4">
+        {m[1]}
+      </Link>
+    ) : (
+      part
+    );
+  });
+}
+
 /**
  * Note under the products (set per menu head or subcategory in Admin → Categories). The first paragraph is
  * the heading; a WhatsApp button follows when a number is set.
@@ -121,7 +136,7 @@ async function FooterNote({ note }: { note: string }) {
       <p className="font-serif text-2xl font-bold text-chilli">{heading}</p>
       {body.map((p, i) => (
         <p key={i} className="mt-3 text-ink/80">
-          {p}
+          {withLinks(p)}
         </p>
       ))}
       {number && (

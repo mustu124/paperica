@@ -72,8 +72,10 @@ from (values
 
   ('personalised', 'Custom Notebooks',  'custom-notebooks',  1, 'manual'),
   ('personalised', 'Custom Planners',   'custom-planners',   2, 'manual'),
-  ('personalised', 'Corporate Gifting', 'corporate-gifting', 3, 'content_page'),
-  ('personalised', 'Custom Orders',     'custom-orders',     4, 'content_page')
+  ('personalised', 'Custom Photo Books', 'custom-photo-books', 3, 'manual'),
+  ('personalised', 'Custom Stationery', 'custom-stationery', 4, 'manual'),
+  -- Custom Orders (the guided quote form) is linked from the Custom Notebooks note, not the menu.
+  ('personalised', 'Corporate Gifting', 'corporate-gifting', 5, 'content_page')
 ) as v(category_slug, name, slug, sort_order, kind)
 join public.categories c on c.slug = v.category_slug
 on conflict (category_id, slug) do update set

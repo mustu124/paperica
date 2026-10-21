@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { ImageUpload } from "@/components/admin/image-upload";
 import { RichText } from "@/components/admin/rich-text";
 import { Card, Field, inputCls } from "@/components/admin/ui";
 import { useSave } from "@/components/admin/use-save";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { optionsToText, textToOptions, type FormConfig } from "@/lib/enquiry-forms";
+import { optionsToText, textToOptions, type FormConfig, type GalleryImage } from "@/lib/enquiry-forms";
 import { saveAbout, savePage } from "../actions";
 
 type Token = { token: string; meaning: string; value: string };
@@ -125,6 +126,8 @@ export function PageForm({
 }) {
   const [v, setV] = useState(initial);
   const [formText, setFormText] = useState(() => formToText(form));
+  const [gallery, setGallery] = useState<GalleryImage[]>(form?.gallery ?? []);
+  const setPhoto = (i: number, patch: Partial<GalleryImage>) => setGallery((g) => g.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const { run, pending } = useSave();
   const set = <K extends keyof typeof v>(k: K, value: (typeof v)[K]) => setV((s) => ({ ...s, [k]: value }));
   const setForm = (k: string, value: string) => setFormText((s) => ({ ...s, [k]: value }));
@@ -133,7 +136,7 @@ export function PageForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        void run(() => savePage(slug, { ...v, form_config: form ? textToForm(form.form, formText) : null }), "Page saved");
+        void run(() => savePage(slug, { ...v, form_config: form ? { ...textToForm(form.form, formText), gallery: gallery.filter((g) => g.url) } : null }), "Page saved");
       }}
     >
       <Shell title={label} path={path} tokens={tokens} pending={pending}>
@@ -185,6 +188,27 @@ export function PageForm({
                 </Field>
               ))}
             </div>
+          </Card>
+        )}
+        {form && (
+          <Card title="Photos" description="Shown above the form, two per row. Add a short caption under each (e.g. Branded stationery).">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {gallery.map((g, i) => (
+                <div key={i} className="space-y-2">
+                  <ImageUpload value={g.url || null} onChange={(url) => setPhoto(i, { url: url ?? "" })} folder="pages" label={`Photo ${i + 1}`} />
+                  <input value={g.caption} onChange={(e) => setPhoto(i, { caption: e.target.value })} placeholder="Caption" aria-label={`Photo ${i + 1} caption`} className={inputCls} />
+                  <input value={g.alt} onChange={(e) => setPhoto(i, { alt: e.target.value })} placeholder="Describe the photo" aria-label={`Photo ${i + 1} description`} className={inputCls} />
+                  <button type="button" onClick={() => setGallery((x) => x.filter((_, j) => j !== i))} className="text-xs text-chilli underline underline-offset-4">
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            {gallery.length < 12 && (
+              <Button type="button" variant="secondary" size="sm" className="mt-4" onClick={() => setGallery((x) => [...x, { url: "", alt: "", caption: "" }])}>
+                Add photo
+              </Button>
+            )}
           </Card>
         )}
         <div className="space-y-1.5 text-sm">
