@@ -15,14 +15,3 @@ export async function onOrderPaid(orderId: string): Promise<void> {
   }
 }
 
-/**
- * Called once when a contact-form enquiry is saved. Enquiries are listed in the admin panel;
- * plug an email/alert to the shop owner in here if wanted. Must not throw.
- */
-export async function onEnquiryReceived(enquiryId: string): Promise<void> {
-  try {
-    console.info(`[notifications] enquiry ${enquiryId} received (no alert configured)`);
-  } catch (e) {
-    console.error("[notifications] onEnquiryReceived failed:", (e as Error).message);
-  }
-}

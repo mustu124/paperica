@@ -6,7 +6,6 @@ import {
   ClipboardList,
   ExternalLink,
   FileText,
-  Inbox,
   LayoutTemplate,
   ListTree,
   LogOut,
@@ -27,7 +26,6 @@ const NAV: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: "/admin/categories", label: "Categories & Menu", Icon: ListTree },
   { href: "/admin/pages", label: "Pages & FAQs", Icon: FileText },
   { href: "/admin/settings", label: "Site Settings", Icon: Settings },
-  { href: "/admin/enquiries", label: "Enquiries", Icon: Inbox },
 ];
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {

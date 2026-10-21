@@ -89,13 +89,6 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
     ],
   },
   {
-    title: "Homepage & footer",
-    fields: [
-      { key: "hero_rotation_ms", label: "Hero image swap speed (milliseconds)", type: "number", hint: "3000 = every 3 seconds." },
-      { key: "footer_about_blurb", label: "Footer “About” blurb", type: "textarea" },
-    ],
-  },
-  {
     title: "Messages & templates",
     description: "Small pieces of text used around the shop.",
     fields: [

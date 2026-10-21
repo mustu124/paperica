@@ -1,14 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Send } from "lucide-react";
-import { useState, useTransition } from "react";
+import { Mail } from "lucide-react";
+import { useState } from "react";
 import { useForm, useWatch, type FieldError } from "react-hook-form";
-import { submitEnquiry } from "@/app/(site)/contact/actions";
 import { Button } from "@/components/ui/button";
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
 import { ENQUIRY_TYPES, enquirySchema, enquiryWhatsappMessage, type Enquiry, type EnquiryInput } from "@/lib/enquiry";
-import { cn } from "@/lib/cn";
 import { whatsappUrl } from "@/lib/whatsapp";
 import type { EnquiryType } from "@/types/db";
 
@@ -33,24 +31,21 @@ function Field({ label, error, optional, children }: { label: string; error?: Fi
 }
 
 /**
- * Contact form. Routing by enquiry type:
- *   Customer Support     → saved enquiry (admin inbox)
- *   Personalised Orders  → opens WhatsApp with the details pre-filled (not stored)
- *   Corporate Gifting    → WhatsApp, or the short enquiry form (saved)
+ * Contact form. Nothing is stored: the message opens in WhatsApp with the details filled in
+ * (or in the customer's email app when no WhatsApp number is set).
  */
 export function EnquiryForm({
   whatsappNumber,
   whatsappIntro,
+  contactEmail,
   defaultType,
 }: {
   whatsappNumber: string;
   whatsappIntro: string;
+  contactEmail: string;
   defaultType?: EnquiryType;
 }) {
-  const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
-  const [via, setVia] = useState<"whatsapp" | "form">("form");
 
   const {
     register,
@@ -68,30 +63,16 @@ export function EnquiryForm({
 
   const onSubmit = (values: Enquiry) => {
     setServerError(null);
-    if (whatsappOnly || via === "whatsapp") {
-      if (!whatsappNumber) {
-        setServerError("WhatsApp isn't available right now — please email us instead.");
-        return;
-      }
-      window.open(whatsappUrl(whatsappNumber, enquiryWhatsappMessage(whatsappIntro, values)), "_blank", "noopener,noreferrer");
-      return;
+    if (values.website) return; // honeypot
+    const message = enquiryWhatsappMessage(whatsappIntro, values);
+    if (whatsappNumber) {
+      window.open(whatsappUrl(whatsappNumber, message), "_blank", "noopener,noreferrer");
+    } else if (contactEmail) {
+      window.location.assign(`mailto:${contactEmail}?subject=${encodeURIComponent("Enquiry from the website")}&body=${encodeURIComponent(message)}`);
+    } else {
+      setServerError("We can't take messages here right now. Please try again later.");
     }
-    startTransition(async () => {
-      const result = await submitEnquiry(values);
-      if (result.ok) setSent(true);
-      else setServerError(result.error);
-    });
   };
-
-  if (sent) {
-    return (
-      <div role="status" className="flex flex-col items-center gap-3 border border-taupe bg-paper/40 px-6 py-12 text-center">
-        <CheckCircle2 className="size-10 text-stem-deep" strokeWidth={1.5} aria-hidden />
-        <p className="font-serif text-2xl font-semibold">Thank you — we&apos;ve received your message</p>
-        <p className="text-sm text-ink-muted">We&apos;ll get back to you by email.</p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
@@ -161,27 +142,10 @@ export function EnquiryForm({
         </p>
       )}
 
-      <div className={cn("flex flex-col gap-3", corporate && "sm:flex-row")}>
-        {(whatsappOnly || corporate) && whatsappNumber && (
-          <Button type="submit" size="lg" onClick={() => setVia("whatsapp")} className={corporate ? "sm:flex-1" : undefined}>
-            <WhatsAppIcon />
-            {whatsappOnly ? "Continue on WhatsApp" : "Send on WhatsApp"}
-          </Button>
-        )}
-        {!whatsappOnly && (
-          <Button
-            type="submit"
-            size="lg"
-            variant={corporate ? "secondary" : "primary"}
-            disabled={pending}
-            onClick={() => setVia("form")}
-            className={corporate ? "sm:flex-1" : undefined}
-          >
-            <Send className="size-4" aria-hidden />
-            {pending ? "Sending…" : corporate ? "Submit enquiry" : "Send message"}
-          </Button>
-        )}
-      </div>
+      <Button type="submit" size="lg" className="sm:self-start sm:min-w-64">
+        {whatsappNumber ? <WhatsAppIcon /> : <Mail className="size-4" aria-hidden />}
+        {whatsappNumber ? "Send on WhatsApp" : "Send by email"}
+      </Button>
       {whatsappOnly && (
         <p className="text-xs text-ink-muted">
           Personalised orders are arranged on WhatsApp, where we can share designs and confirm details with you.

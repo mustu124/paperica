@@ -25,20 +25,23 @@ async function FormWithDefault({
   searchParams,
   whatsappNumber,
   whatsappIntro,
+  contactEmail,
 }: {
   searchParams: PageProps<"/contact">["searchParams"];
   whatsappNumber: string;
   whatsappIntro: string;
+  contactEmail: string;
 }) {
   const { type } = await searchParams;
   const t = typeof type === "string" && (TYPES as string[]).includes(type) ? (type as EnquiryType) : undefined;
-  return <EnquiryForm whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} defaultType={t} />;
+  return <EnquiryForm whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} contactEmail={contactEmail} defaultType={t} />;
 }
 
 export default async function ContactPage({ searchParams }: PageProps<"/contact">) {
   const [page, settings] = await Promise.all([getPage("contact"), getSiteSettings()]);
   const whatsappNumber = settingString(settings, "whatsapp_number");
   const whatsappIntro = renderTokensText(settingString(settings, "whatsapp_enquiry_intro"), settings);
+  const contactEmail = settingString(settings, "contact_email");
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-6 md:px-6">
@@ -63,8 +66,8 @@ export default async function ContactPage({ searchParams }: PageProps<"/contact"
           <h2 id="enquiry-heading" className="mb-5 font-serif text-2xl font-semibold">
             Send us a message
           </h2>
-          <Suspense fallback={<EnquiryForm whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} />}>
-            <FormWithDefault searchParams={searchParams} whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} />
+          <Suspense fallback={<EnquiryForm whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} contactEmail={contactEmail} />}>
+            <FormWithDefault searchParams={searchParams} whatsappNumber={whatsappNumber} whatsappIntro={whatsappIntro} contactEmail={contactEmail} />
           </Suspense>
         </section>
       </div>
