@@ -51,7 +51,6 @@ For personalised items, customers don't pay online. They message you on WhatsApp
 The product page now shows a **Customise on WhatsApp** button. When a customer taps it, WhatsApp opens with a message that includes the product name and link.
 
 - Anything placed in the **PERSONALISED** category is always WhatsApp only. The shop won't let you switch it back to Buy online.
-- To change the pre-filled message, go to **Site Settings** → **"Customise on WhatsApp" message**.
 
 ---
 
@@ -126,14 +125,14 @@ When a customer buys enough products marked **New**, a free item is added to the
 - If the free item is sold out, the order still goes through without it, and checkout says so.
 - In **Orders**, it shows as "Snap-in Separators (free gift)" at ₹0. Its stock goes down like any other item.
 
-To change or stop it, go to **Site Settings** → **Free gift offer**. You can:
+To change, add or stop offers, go to **Offers** in the admin menu. Each offer is built by picking:
 
-- turn the offer on or off;
-- change the text;
-- change how many New products are needed;
-- change the free product, by typing the end of its web address (for example `snap-in-separators`).
+- **Customer buys any:** Products marked New, a whole menu section, or one sub-section.
+- **How many:** 1 to 10.
+- **Gets free:** the free product.
+- **Starts / Ends** (optional).
 
-Then tap **Save settings**. Products marked New show a **Buy 2 · Free gift** tag and a note on their page while the offer is on.
+The wording customers see is written for you, and you can change it. Turn an offer on or off with its switch, then tap **Save offers**. Products that count towards an offer show a **Buy 2 · Free gift** tag and a note on their page.
 
 ---
 
