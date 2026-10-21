@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Original photo bank (1.8 GB of PNGs). Optimised copies are uploaded to Supabase Storage.
 /PAPERICA IMAGE BANK/
+
+# Image downloads from the client Drive (photos are uploaded to Supabase Storage, not kept in git)
+/*-2026*T*Z-*/
