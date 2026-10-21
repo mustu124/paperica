@@ -51,3 +51,8 @@ next-env.d.ts
 
 # Image downloads from the client Drive (photos are uploaded to Supabase Storage, not kept in git)
 /*-2026*T*Z-*/
+# Loose images dropped in the project root (uploaded to Supabase Storage instead)
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
