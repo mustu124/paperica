@@ -561,7 +561,7 @@ from (values
   ('Returns, Replacements & Store Credit', 'Can I return a product if I change my mind?',
    '<p>Routine returns or exchanges are not accepted for products delivered in good condition that match the order.</p>', 401),
   ('Returns, Replacements & Store Credit', 'What if my order arrives damaged or defective?',
-   '<p>Contact us within {{order_damage_report_window_text}} with your order number and clear photos of the product and packaging.</p>', 402),
+   '<p>Contact us within {{order_damage_report_window_text}} of delivery with your order number, clear photos of the product and packaging, and a clear, continuous, unedited unboxing video showing the package being opened from its original sealed condition.</p>', 402),
   ('Returns, Replacements & Store Credit', 'Do you offer refunds?',
    '<p>Replacement or store credit is preferred for eligible issues. Where a refund or another remedy is required by law, it will be provided in accordance with law.</p>', 403),
   ('Returns, Replacements & Store Credit', 'What if a replacement is unavailable?',
