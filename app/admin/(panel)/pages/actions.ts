@@ -61,6 +61,7 @@ const aboutInput = z.object({
   about_intro_html: html,
   founder_story_html: html,
   mission_html: html,
+  about_image_url: z.string().max(1000).refine((v) => v === "" || /^(\/|https:\/\/)/.test(v), "Upload the photo again."),
 });
 
 /** About: the title lives on pages.about; intro, story and mission are site settings. */
@@ -76,6 +77,7 @@ export async function saveAbout(input: z.input<typeof aboutInput>): Promise<Acti
     { key: "about_intro_html", value: empty(v.about_intro_html) },
     { key: "founder_story_html", value: empty(v.founder_story_html) },
     { key: "mission_html", value: empty(v.mission_html) },
+    { key: "about_image_url", value: v.about_image_url },
   ]);
   if (error) return { ok: false, error: friendlyError(error) };
   refreshTags("pages", "settings");

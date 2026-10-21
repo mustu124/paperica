@@ -46,6 +46,7 @@ async function Editor({ params }: Props) {
           about_intro_html: str("about_intro_html"),
           founder_story_html: str("founder_story_html"),
           mission_html: str("mission_html"),
+          about_image_url: str("about_image_url"),
         }}
       />
     );

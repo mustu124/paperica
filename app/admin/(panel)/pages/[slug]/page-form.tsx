@@ -227,7 +227,7 @@ export function AboutForm({
 }: {
   path: string;
   tokens: Token[];
-  initial: { title: string; about_intro_html: string; founder_story_html: string; mission_html: string };
+  initial: { title: string; about_intro_html: string; founder_story_html: string; mission_html: string; about_image_url: string };
 }) {
   const [v, setV] = useState(initial);
   const { run, pending } = useSave();
@@ -245,6 +245,15 @@ export function AboutForm({
           <Field label="Title">
             <input value={v.title} onChange={(e) => set("title", e.target.value)} className={inputCls} />
           </Field>
+        </Card>
+        <Card title="Photo" description="Shown in the arch beside the intro. A portrait photo works best (4:5).">
+          <ImageUpload
+            value={v.about_image_url || null}
+            onChange={(url) => set("about_image_url", url ?? "")}
+            folder="pages"
+            label="About photo"
+            className="max-w-56"
+          />
         </Card>
         <div className="space-y-1.5 text-sm">
           <span className="font-medium">Intro (top of the page)</span>

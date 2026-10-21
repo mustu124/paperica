@@ -137,6 +137,8 @@ Then tap **Save settings**. Products marked New show a **Buy 2 · Free gift** ta
 1. Go to **Pages & FAQs** → **About**.
 2. Edit the **Our Story (keep the heading at the top)** box. Use the toolbar for bold, lists and links.
    - The **Intro** and **Our Mission** boxes are on the same page.
+   - **Photo** is the picture in the arch at the top of the About page. A portrait photo works best.
+   - A heading at the top of Our Story or Our Mission becomes that card's title. Without one, they're called Our Story and Our Mission.
 3. Tap **Save page**.
 
 ---
