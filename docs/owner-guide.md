@@ -68,13 +68,18 @@ The product page now shows a **Customise on WhatsApp** button. When a customer t
 
 On the **Homepage** list, the arrows move a section up or down. The **Shown / Hidden** switch shows or hides it.
 
-Photo sizes that work well:
+Photo sizes that work well (pixels, width × height):
 
-| Section | Shape |
-| --- | --- |
-| Hero | wide landscape |
-| Collection tiles | portrait |
-| Instagram | square |
+| Section | Laptop / desktop | Phone version (optional) |
+| --- | --- | --- |
+| Hero banner | 2400 × 1000 (12:5) | 1080 × 1920 (9:16) |
+| Shop By Collection tiles | 1000 × 1000 (square) | same photo |
+| Promo banners (two) | 1350 × 1500 (9:10) | 1080 × 1350 (4:5) |
+| Product feature ("The New Collection" photos, top and bottom) | 1600 × 1000 (16:10) | same photo |
+| Promo tiles (three) | 1200 × 1200 (square) | same photo |
+| Instagram | 1080 × 1350 (4:5) | same photo |
+
+Photos are trimmed to fit the shape, so keep the main subject in the middle and leave a little space around the edges.
 
 ---
 

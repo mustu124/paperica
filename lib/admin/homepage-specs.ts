@@ -117,11 +117,12 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
   },
   product_mosaic: {
     title: "Product feature",
-    description: "Two stacked lifestyle images with a caption, next to up to 8 products.",
+    description:
+      "Two stacked lifestyle images with a caption, next to up to 8 products. Images: landscape 16:10, about 1600 × 1000 (the same photo works on laptop and phone). Keep the subject in the centre; the caption sits on the bottom-left of the bottom image.",
     slots: { fixed: 1 },
     slotLabel: "Lifestyle block",
     images: ["Top image", "Bottom image"],
-    aspect: "aspect-[9/7]",
+    aspect: "aspect-[16/10]",
     fields: [
       { key: "heading", label: "Caption" },
       { key: "link_url", label: "Link", link: true },

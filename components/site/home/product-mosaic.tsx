@@ -32,9 +32,11 @@ export function ProductMosaic({
   const tone = TONES.includes(toneSetting) ? toneSetting : "blush";
 
   const lifestyle = (
-    <div className="relative grid h-full min-h-[28rem] grid-rows-2 gap-2 overflow-hidden rounded-3xl">
+    // Laptops: the two photos fill the height beside the products (≈16:10 each). Phones and
+    // tablets: each photo is 16:10 (a fixed height made thin strips on tablets).
+    <div className="relative grid h-full gap-2 overflow-hidden rounded-3xl lg:min-h-[28rem] lg:grid-rows-2">
       {images.map((img) => (
-        <div key={img.id} className="relative overflow-hidden rounded-3xl bg-blush">
+        <div key={img.id} className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-blush lg:aspect-auto">
           <ArtImage
             src={img.image_url as string}
             mobileSrc={img.mobile_image_url}
