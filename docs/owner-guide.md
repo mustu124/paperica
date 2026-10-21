@@ -128,7 +128,7 @@ To change or stop it, go to **Site Settings** → **Free gift offer**. You can:
 - change how many New products are needed;
 - change the free product, by typing the end of its web address (for example `snap-in-separators`).
 
-Then tap **Save settings**. Remember to update the announcement bar text too.
+Then tap **Save settings**. Products marked New show a **Buy 2 · Free gift** tag and a note on their page while the offer is on.
 
 ---
 

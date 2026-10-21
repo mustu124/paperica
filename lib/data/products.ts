@@ -2,7 +2,9 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPublicClient } from "@/lib/supabase/public";
+import { countsTowardsOffer, giftOffer } from "@/lib/offer";
 import type { ProductMode } from "@/types/db";
+import { getSiteSettings } from "./settings";
 import { TAGS } from "./tags";
 
 /** Lightweight product row used for listing, filtering and sorting (no images). */
@@ -43,6 +45,8 @@ export type ProductCardData = {
   /** Has options (colour, ruling…), so it can't be added to the cart straight from a card. */
   hasOptions: boolean;
   maxQty: number | null;
+  /** Corner tag when the product counts towards the free gift offer, e.g. "Buy 2 · Free gift". */
+  offerTag: string | null;
 };
 
 export function productHref(slug: string) {
@@ -128,10 +132,11 @@ export async function getCatalog(): Promise<{ products: ProductRow[]; placements
 export async function getProductCards(ids: string[]): Promise<ProductCardData[]> {
   "use cache";
   cacheLife({ stale: 60, revalidate: 60, expire: 86400 });
-  cacheTag(TAGS.products);
+  cacheTag(TAGS.products, TAGS.settings);
 
   if (ids.length === 0) return [];
-  const { products } = await getCatalog();
+  const [{ products }, settings] = await Promise.all([getCatalog(), getSiteSettings()]);
+  const offer = giftOffer(settings);
   const byId = new Map(products.map((p) => [p.id, p]));
   const rows = ids.flatMap((id) => byId.get(id) ?? []);
 
@@ -164,6 +169,7 @@ export async function getProductCards(ids: string[]): Promise<ProductCardData[]>
       // If options couldn't be loaded, send shoppers to the product page rather than guess.
       hasOptions: withOptions.has(r.id) || Boolean(variantError),
       maxQty: r.stockQty,
+      offerTag: countsTowardsOffer(offer, r) && offer ? `Buy ${offer.minQty} · Free gift` : null,
     };
   });
 }

@@ -1,3 +1,5 @@
+import { Gift } from "lucide-react";
+import { countsTowardsOffer, giftOffer } from "@/lib/offer";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -85,6 +87,7 @@ async function ProductContent({ params }: Pick<Props, "params">) {
   if (!product) notFound();
 
   const related = await getRelatedProducts(product);
+  const offer = giftOffer(settings);
   const brand = settingString(settings, "brand_name");
   const url = `${SITE_URL}/products/${product.slug}`;
   const s = (key: string) => renderTokensText(settingString(settings, key), settings);
@@ -178,6 +181,16 @@ async function ProductContent({ params }: Pick<Props, "params">) {
             }))}
             copy={copy}
           />
+
+          {offer && countsTowardsOffer(offer, { isNew: product.is_new, mode: product.mode, slug: product.slug }) && inStock && (
+            <p className="mt-6 flex items-start gap-3 rounded-2xl bg-butter/70 px-4 py-3 text-sm">
+              <Gift className="mt-0.5 size-5 shrink-0 text-chilli" aria-hidden />
+              <span>
+                <strong className="font-semibold">{offer.text || `Buy any ${offer.minQty} from the New Collection and get a free gift`}</strong>
+                <span className="block text-ink-muted">This product counts towards it. The free gift is added automatically at checkout.</span>
+              </span>
+            </p>
+          )}
 
           <div className="mt-6">
             <ShareButton url={url.startsWith("http") ? url : ""} title={product.name} />

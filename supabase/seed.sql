@@ -88,7 +88,7 @@ on conflict (category_id, slug) do update set
 insert into public.site_settings (key, value) values
   ('brand_name',                      to_jsonb('Paperica'::text)),
   ('tagline',                         to_jsonb('All Things Paper'::text)),
-  ('announcement_bar_text',           to_jsonb('Buy any 2 from the New Collection, get Snap-in Separators free | Free shipping on orders above ₹{{free_shipping_threshold_inr}} | Delivering across India'::text)),
+  ('announcement_bar_text',           to_jsonb('Free shipping on orders above ₹{{free_shipping_threshold_inr}} | Delivering across India'::text)),
   ('announcement_bar_enabled',        'true'::jsonb),
   ('contact_email',                   to_jsonb('paperica26@gmail.com'::text)),
   ('whatsapp_number',                 to_jsonb('919769223863'::text)),
