@@ -33,7 +33,7 @@ insert into public.categories (name, slug, sort_order, show_in_menu, image_url, 
      {"url":"/placeholders/products/placeholder-sticky-notes-1.svg","alt":"Replace me: placeholder sticky notes","label":"Sticky Notes","link_url":"/collections/paper-edit/sticky-notes"}]'),
   ('GIFTS', 'gifts', 5, true, '/placeholders/categories/gifts.svg', 'buy',
    '[{"url":"/placeholders/products/placeholder-softcover-notebook-set-1.svg","alt":"Replace me: placeholder gift set","label":"Gift Sets","link_url":"/collections/gifts/gift-sets"},
-     {"url":"/placeholders/products/placeholder-custom-name-notebook-1.svg","alt":"Replace me: placeholder personalised notebook","label":"Personalised Gifts","link_url":"/collections/gifts/personalised-gifts"}]'),
+     {"url":"/placeholders/products/placeholder-weekly-planner-1.svg","alt":"Replace me: placeholder gift","label":"Gifts Under ₹1,000","link_url":"/collections/gifts/gifts-under-1000"}]'),
   ('PERSONALISED', 'personalised', 6, true, '/placeholders/categories/personalised.svg', 'whatsapp',
    '[{"url":"/placeholders/products/placeholder-custom-name-notebook-1.svg","alt":"Replace me: placeholder custom notebook","label":"Custom Notebooks","link_url":"/collections/personalised/custom-notebooks"},
      {"url":"/placeholders/products/placeholder-custom-planner-1.svg","alt":"Replace me: placeholder custom planner","label":"Corporate Gifting","link_url":"/collections/personalised/corporate-gifting"}]')
@@ -69,11 +69,8 @@ from (values
   ('paper-edit', 'Sticky Notes',       'sticky-notes',       4, 'manual'),
 
   ('gifts', 'View All',           'view-all',           1, 'view_all'),
-  ('gifts', 'Gifts for Her',      'gifts-for-her',      2, 'manual'),
-  ('gifts', 'Gifts for Him',      'gifts-for-him',      3, 'manual'),
-  ('gifts', 'Gift Sets',          'gift-sets',          4, 'manual'),
-  ('gifts', 'Gifts Under ₹1,000', 'gifts-under-1000',   5, 'filter_under_1000'),
-  ('gifts', 'Personalised Gifts', 'personalised-gifts', 6, 'filter_personalised'),
+  ('gifts', 'Gift Sets',          'gift-sets',          2, 'manual'),
+  ('gifts', 'Gifts Under ₹1,000', 'gifts-under-1000',   3, 'filter_under_1000'),
 
   ('personalised', 'Custom Notebooks',  'custom-notebooks',  1, 'manual'),
   ('personalised', 'Custom Planners',   'custom-planners',   2, 'manual'),
@@ -692,6 +689,15 @@ cross join (values
 -- Every name starts with "[Replace me]" and every image lives in /public/placeholders.
 -- Delete these before launch (Admin → Products, or:
 --   delete from public.products where slug like 'placeholder-%';)
+
+-- Gift Sets: note at the bottom of the page (Catalogue V3 §5). Designs are chosen on WhatsApp after ordering.
+update public.subcategories s
+set footer_note = $n$A little note before you order ♡
+
+All our gift sets can be personalised to your preferences, subject to availability. Once you’ve placed your order, simply connect with us on WhatsApp to share your preferred designs for the journal, notepad and other available items in your gift set. We’ll help you put together a combination you’ll love.$n$
+from public.categories c
+where s.category_id = c.id and c.slug = 'gifts' and s.slug = 'gift-sets' and s.footer_note is null;
+
 -- ===========================================================================
 
 insert into public.products
@@ -774,23 +780,19 @@ from (values
   ('placeholder-spiral-notebook-a5',     'notebooks-journals', 'spiral-bound-notebooks'),
   ('placeholder-dot-grid-journal',       'notebooks-journals', 'journals'),
   ('placeholder-softcover-notebook-set', 'notebooks-journals', 'softcover-notebooks'),
-  ('placeholder-softcover-notebook-set', 'gifts',              'gifts-for-her'),
   ('placeholder-softcover-notebook-set', 'gifts',              'gift-sets'),
   ('placeholder-undated-planner',        'planners',           'undated-planners'),
   ('placeholder-weekly-planner',         'planners',           'weekly-planners'),
   ('placeholder-weekly-planner',         'gifts',              'gift-sets'),
   ('placeholder-notepad-trio',           'paper-edit',         'notepads'),
-  ('placeholder-notepad-trio',           'gifts',              'gifts-for-her'),
+  ('placeholder-notepad-trio',           'gifts',              'gift-sets'),
   ('placeholder-bookmark-set',           'paper-edit',         'bookmarks'),
-  ('placeholder-bookmark-set',           'gifts',              'gifts-for-him'),
   ('placeholder-snap-in-separators',     'paper-edit',         'snap-in-separators'),
   ('placeholder-greeting-card-pack',     'paper-edit',         'cards'),
   ('placeholder-sticky-notes',           'paper-edit',         'sticky-notes'),
   ('placeholder-custom-name-notebook',   'personalised',       'custom-notebooks'),
-  ('placeholder-custom-name-notebook',   'gifts',              'gifts-for-her'),
   ('placeholder-custom-planner',         'personalised',       'custom-planners'),
-  ('placeholder-custom-planner',         'personalised',       'corporate-gifting'),
-  ('placeholder-custom-planner',         'gifts',              'gifts-for-him')
+  ('placeholder-custom-planner',         'personalised',       'corporate-gifting')
 ) as v(product_slug, category_slug, subcategory_slug)
 join public.products p      on p.slug = v.product_slug
 join public.categories c    on c.slug = v.category_slug

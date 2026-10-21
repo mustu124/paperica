@@ -90,8 +90,10 @@ export type Database = {
           sort_order: number;
           kind: SubcategoryKind;
           description: string | null;
+          /** Optional note at the bottom of the collection page (e.g. Gift Sets). */
+          footer_note: string | null;
         },
-        "id" | "sort_order" | "kind"
+        "id" | "sort_order" | "kind" | "description" | "footer_note"
       >;
       products: T<
         {
@@ -143,6 +145,11 @@ export type Database = {
         "id" | "option_group" | "sort_order"
       >;
       product_subcategories: T<{ product_id: string; subcategory_id: string }>;
+      /** Contents of a gift set: `qty` × any product in `subcategory_id`. */
+      product_bundle_items: T<
+        { id: string; bundle_id: string; subcategory_id: string; label: string; qty: number; sort_order: number },
+        "id" | "qty" | "sort_order"
+      >;
       site_settings: T<
         { key: string; value: Json; updated_at: string },
         "value" | "updated_at"

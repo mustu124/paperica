@@ -37,6 +37,13 @@ async function OrderDetail({ params }: Props) {
     admin.supabase.from("site_settings").select("value").eq("key", "whatsapp_tracking_template").maybeSingle(),
   ]);
   if (!order) notFound();
+  // Gift sets in this order (designs are chosen on WhatsApp, so component stock is reduced by hand).
+  const productIds = (items ?? []).flatMap((it) => (it.product_id ? [it.product_id] : []));
+  const { data: bundleRows } = productIds.length
+    ? await admin.supabase.from("product_bundle_items").select("bundle_id, label, qty").in("bundle_id", productIds).order("sort_order")
+    : { data: [] };
+  const contents = (productId: string | null) => (bundleRows ?? []).filter((b) => b.bundle_id === productId);
+  const hasGiftSet = (bundleRows ?? []).length > 0;
 
   const address = [
     order.customer_name,
@@ -80,6 +87,11 @@ async function OrderDetail({ params }: Props) {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{it.product_name}</p>
                     {it.variant_label && <p className="text-sm text-ink-muted">{it.variant_label}</p>}
+                    {contents(it.product_id).length > 0 && (
+                      <p className="text-sm text-ink-muted">
+                        Gift set: {contents(it.product_id).map((b) => `${b.qty * it.qty} × ${b.label}`).join(", ")}
+                      </p>
+                    )}
                   </div>
                   <p className="ml-16 whitespace-nowrap text-sm sm:ml-0">
                     {it.qty} × {formatINR(it.unit_price_inr)}
@@ -88,6 +100,13 @@ async function OrderDetail({ params }: Props) {
                 </li>
               ))}
             </ul>
+            {hasGiftSet && order.payment_status === "paid" && order.dispatch_status === "processing" && (
+              <p role="note" className="mt-3 rounded-md bg-butter/70 px-3 py-2 text-sm">
+                <strong>Gift set:</strong> agree the designs with the customer on WhatsApp. Before you mark this order
+                Dispatched, reduce the stock of the designs you packed (Products → each item), so the gift set&apos;s
+                availability stays right.
+              </p>
+            )}
             <dl className="ml-auto mt-4 max-w-xs space-y-1 text-sm">
               <div className="flex justify-between">
                 <dt>Subtotal</dt>

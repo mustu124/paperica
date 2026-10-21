@@ -40,6 +40,16 @@ const productInput = z.object({
   images: z
     .array(z.object({ id: z.uuid().nullable(), url: z.url().or(z.string().startsWith("/")), alt: z.string().trim().max(200) }))
     .max(30),
+  /** Gift set contents; empty for ordinary products. */
+  bundle_items: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1, "Name every item in the gift set").max(80),
+        subcategory_id: z.uuid("Choose where each gift-set item comes from"),
+        qty: z.number().int().min(1).max(99),
+      }),
+    )
+    .max(20),
 });
 
 export type ProductInput = z.input<typeof productInput>;
@@ -152,6 +162,20 @@ export async function saveProduct(
     if (error) return { ok: false, error: friendlyError(error) };
   }
 
+  // Gift set contents: replace the list (the database then recalculates the set's stock).
+  const { data: oldBundle, error: bundleReadError } = await supabase.from("product_bundle_items").select("id").eq("bundle_id", productId);
+  if (bundleReadError && v.bundle_items.length) return { ok: false, error: friendlyError(bundleReadError) };
+  if (!bundleReadError && (oldBundle?.length || v.bundle_items.length)) {
+    const { error: delBundleError } = await supabase.from("product_bundle_items").delete().eq("bundle_id", productId);
+    if (delBundleError) return { ok: false, error: friendlyError(delBundleError) };
+    if (v.bundle_items.length) {
+      const { error } = await supabase
+        .from("product_bundle_items")
+        .insert(v.bundle_items.map((b, i) => ({ bundle_id: productId as string, subcategory_id: b.subcategory_id, label: b.label, qty: b.qty, sort_order: i })));
+      if (error) return { ok: false, error: friendlyError(error) };
+    }
+  }
+
   // Images: delete removed (and their files), update order/alt, insert new.
   const { data: oldImages } = await supabase.from("product_images").select("id, url").eq("product_id", productId);
   const keepImageIds = new Set(v.images.flatMap((x) => (x.id ? [x.id] : [])));
@@ -216,14 +240,16 @@ export async function duplicateProduct(id: string): Promise<ActionResult<{ id: s
     .single();
   if (error || !copy) return { ok: false, error: friendlyError(error) };
 
-  const [{ data: images }, { data: variants }, { data: links }] = await Promise.all([
+  const [{ data: images }, { data: variants }, { data: links }, { data: bundle }] = await Promise.all([
     supabase.from("product_images").select("url, alt, sort_order").eq("product_id", id),
     supabase.from("product_variants").select("label, option_group, price_override, stock_qty, sort_order").eq("product_id", id),
     supabase.from("product_subcategories").select("subcategory_id").eq("product_id", id),
+    supabase.from("product_bundle_items").select("subcategory_id, label, qty, sort_order").eq("bundle_id", id),
   ]);
   if (images?.length) await supabase.from("product_images").insert(images.map((i) => ({ ...i, product_id: copy.id })));
   if (variants?.length) await supabase.from("product_variants").insert(variants.map((x) => ({ ...x, product_id: copy.id })));
   if (links?.length) await supabase.from("product_subcategories").insert(links.map((l) => ({ ...l, product_id: copy.id })));
+  if (bundle?.length) await supabase.from("product_bundle_items").insert(bundle.map((b) => ({ ...b, bundle_id: copy.id })));
 
   refreshCatalog();
   return { ok: true, data: { id: copy.id } };

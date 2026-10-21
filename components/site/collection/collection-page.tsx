@@ -10,7 +10,11 @@ import { getCatalog } from "@/lib/data/products";
 import { getSiteSettings } from "@/lib/data/settings";
 import { titleCase } from "@/lib/format";
 import { openGraphDefaults } from "@/lib/seo";
+import { renderTokensText } from "@/lib/content";
 import { settingString } from "@/lib/settings";
+import { whatsappUrl } from "@/lib/whatsapp";
+import { buttonClasses } from "@/components/ui/button";
+import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
 import { CollectionResults } from "./collection-results";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -91,7 +95,43 @@ export async function CollectionPage({
           searchParams={searchParams}
         />
       </Suspense>
+
+      {subcategory?.footerNote && <FooterNote note={subcategory.footerNote} />}
     </div>
+  );
+}
+
+/**
+ * Note under the products (set per subcategory in Admin → Categories). The first paragraph is
+ * the heading; a WhatsApp button follows when a number is set.
+ */
+async function FooterNote({ note }: { note: string }) {
+  const settings = await getSiteSettings();
+  const [heading, ...body] = renderTokensText(note, settings)
+    .split(/\n\s*\n|\r\n\s*\r\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const number = settingString(settings, "whatsapp_number");
+  return (
+    <aside className="mx-auto mt-14 max-w-2xl rounded-3xl bg-blush/70 px-6 py-8 text-center md:px-10">
+      <p className="font-serif text-2xl font-bold text-chilli">{heading}</p>
+      {body.map((p, i) => (
+        <p key={i} className="mt-3 text-ink/80">
+          {p}
+        </p>
+      ))}
+      {number && (
+        <a
+          href={whatsappUrl(number, settingString(settings, "whatsapp_default_message") || undefined)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClasses({ size: "lg", className: "mt-6" })}
+        >
+          <WhatsAppIcon />
+          Chat on WhatsApp
+        </a>
+      )}
+    </aside>
   );
 }
 

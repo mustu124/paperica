@@ -25,14 +25,17 @@ function SubRow({
   isFirst,
   isLast,
 }: {
-  sub: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string };
+  sub: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string };
   isFirst: boolean;
   isLast: boolean;
 }) {
   const [name, setName] = useState(sub.name);
   const [description, setDescription] = useState(sub.description);
+  const [footerNote, setFooterNote] = useState(sub.footerNote);
+  const [noteOpen, setNoteOpen] = useState(Boolean(sub.footerNote));
   const { run, pending } = useSave();
-  const dirty = name !== sub.name || description !== sub.description;
+  const noteDirty = footerNote !== sub.footerNote;
+  const dirty = name !== sub.name || description !== sub.description || noteDirty;
 
   return (
     <li className="grid gap-2 rounded-md bg-paper/40 p-3 md:grid-cols-[auto_1fr_1.4fr_auto] md:items-center">
@@ -56,7 +59,11 @@ function SubRow({
         className={`${inputCls} py-1.5 lg:text-sm`}
       />
       <div className="flex gap-2">
-        <Button size="sm" disabled={!dirty || pending} onClick={() => run(() => saveSubcategory(sub.id, { name, description }))}>
+        <Button
+          size="sm"
+          disabled={!dirty || pending}
+          onClick={() => run(() => saveSubcategory(sub.id, { name, description, ...(noteDirty ? { footer_note: footerNote } : {}) }))}
+        >
           Save
         </Button>
         {sub.kind === "manual" && (
@@ -71,6 +78,17 @@ function SubRow({
           </button>
         )}
       </div>
+      {sub.kind !== "content_page" &&
+        (noteOpen ? (
+          <label className="flex flex-col gap-1 text-xs text-ink-muted md:col-span-4">
+            Note at the bottom of this page — first paragraph is the heading; a “Chat on WhatsApp” button is added. Leave empty for none.
+            <textarea rows={4} value={footerNote} onChange={(e) => setFooterNote(e.target.value)} className={`${inputCls} text-sm text-ink`} />
+          </label>
+        ) : (
+          <button type="button" onClick={() => setNoteOpen(true)} className="justify-self-start text-xs text-chilli underline underline-offset-4 md:col-span-4">
+            Add a note at the bottom of this page
+          </button>
+        ))}
     </li>
   );
 }
@@ -82,7 +100,7 @@ export function CategoryEditor({
   isLast,
 }: {
   category: { id: string; name: string; slug: string; showInMenu: boolean; description: string; imageUrl: string | null; features: Feature[] };
-  subcategories: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string }[];
+  subcategories: { id: string; name: string; slug: string; kind: SubcategoryKind; description: string; footerNote: string }[];
   isFirst: boolean;
   isLast: boolean;
 }) {

@@ -25,6 +25,7 @@ export type CategoryOption = {
 
 type Variant = ProductInput["variants"][number];
 type Img = ProductInput["images"][number];
+type BundleItem = ProductInput["bundle_items"][number];
 
 const numOrNull = (s: string) => (s.trim() === "" ? null : Number(s));
 const move = <T,>(list: T[], from: number, to: number) => {
@@ -62,6 +63,13 @@ export function ProductForm({
   const setVariant = (i: number, patch: Partial<Variant>) =>
     set("variants", v.variants.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const setImage = (i: number, patch: Partial<Img>) => set("images", v.images.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  const setBundle = (i: number, patch: Partial<BundleItem>) =>
+    set("bundle_items", v.bundle_items.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  const isBundle = v.bundle_items.length > 0;
+  // Item sources for gift sets: the hand-picked subcategories (Notepads, Journals...).
+  const pools = categories.flatMap((c) =>
+    c.subcategories.filter((s) => s.kind === "manual").map((s) => ({ id: s.id, name: `${c.name} → ${s.name}` })),
+  );
 
   const onUpload = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -372,13 +380,72 @@ export function ProductForm({
             </div>
           </Card>
 
+          <Card
+            title="Gift set contents"
+            description="For a gift set only: what's inside. Each line is “any product in” a section, so the customer can choose designs on WhatsApp after ordering. The set's stock is then worked out from these items."
+          >
+            <div className="space-y-3">
+              {v.bundle_items.map((b, i) => (
+                <div key={i} className="grid grid-cols-[3.5rem_1fr_auto] items-end gap-2 sm:grid-cols-[3.5rem_1fr_1fr_auto]">
+                  <Field label="Qty">
+                    <input
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={b.qty}
+                      onChange={(e) => setBundle(i, { qty: Math.max(1, Number(e.target.value) || 1) })}
+                      className={inputCls}
+                    />
+                  </Field>
+                  <Field label="Item">
+                    <input value={b.label} onChange={(e) => setBundle(i, { label: e.target.value })} placeholder="e.g. Notepad" className={inputCls} />
+                  </Field>
+                  <Field label="Any product in" className="col-span-2 row-start-2 sm:col-span-1 sm:row-start-auto">
+                    <select value={b.subcategory_id} onChange={(e) => setBundle(i, { subcategory_id: e.target.value })} className={inputCls}>
+                      <option value="">Choose…</option>
+                      {pools.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <button
+                    type="button"
+                    aria-label={`Remove ${b.label || "item"}`}
+                    onClick={() => set("bundle_items", v.bundle_items.filter((_, j) => j !== i))}
+                    className="flex size-11 items-center justify-center rounded-md text-ink-muted hover:bg-blush/50 hover:text-chilli"
+                  >
+                    <Trash2 className="size-4" aria-hidden />
+                  </button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => set("bundle_items", [...v.bundle_items, { label: "", subcategory_id: "", qty: 1 }])}
+              >
+                <Plus className="size-4" aria-hidden /> Add item
+              </Button>
+            </div>
+          </Card>
+
           <Card title="Stock">
             <div className="space-y-4">
               <Field label="SKU">
                 <input value={v.sku} onChange={(e) => set("sku", e.target.value)} className={inputCls} />
               </Field>
-              <Toggle checked={v.track_stock} onChange={(x) => set("track_stock", x)} label="Track stock" />
-              {v.track_stock && (
+              {isBundle ? (
+                <p className="rounded-md bg-butter/60 px-3 py-2 text-sm">
+                  Gift set: {initial.bundle_items.length ? <strong>{initial.stock_qty ?? 0} available</strong> : "available"} — worked out from the
+                  contents above. Paid gift-set orders hold their items until you mark them Dispatched; reduce the stock of the
+                  designs you packed at the same time.
+                </p>
+              ) : (
+                <Toggle checked={v.track_stock} onChange={(x) => set("track_stock", x)} label="Track stock" />
+              )}
+              {!isBundle && v.track_stock && (
                 <>
                   <Field label="Stock quantity" hint={v.variants.length ? "Options with their own stock use that instead." : undefined}>
                     <input type="number" min={0} value={stockText} onChange={(e) => setStockText(e.target.value)} className={inputCls} />

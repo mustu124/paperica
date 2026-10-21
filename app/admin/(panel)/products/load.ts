@@ -25,6 +25,7 @@ export const EMPTY_PRODUCT: ProductInput = {
   subcategory_ids: [],
   variants: [],
   images: [],
+  bundle_items: [],
 };
 
 export async function loadCategoryOptions(supabase: Supabase): Promise<CategoryOption[]> {
@@ -41,11 +42,13 @@ export async function loadCategoryOptions(supabase: Supabase): Promise<CategoryO
 }
 
 export async function loadProduct(supabase: Supabase, id: string): Promise<ProductInput | null> {
-  const [{ data: p }, { data: images }, { data: variants }, { data: links }] = await Promise.all([
+  const [{ data: p }, { data: images }, { data: variants }, { data: links }, { data: bundle }] = await Promise.all([
     supabase.from("products").select("*").eq("id", id).maybeSingle(),
     supabase.from("product_images").select("id, url, alt, sort_order").eq("product_id", id).order("sort_order"),
     supabase.from("product_variants").select("*").eq("product_id", id).order("sort_order"),
     supabase.from("product_subcategories").select("subcategory_id").eq("product_id", id),
+    // Empty (not an error) on a database without the gift-sets migration.
+    supabase.from("product_bundle_items").select("label, subcategory_id, qty").eq("bundle_id", id).order("sort_order"),
   ]);
   if (!p) return null;
   const num = (v: number | string | null) => (v == null ? null : Number(v));
@@ -75,5 +78,6 @@ export async function loadProduct(supabase: Supabase, id: string): Promise<Produ
       stock_qty: x.stock_qty,
     })),
     images: (images ?? []).map((i) => ({ id: i.id, url: i.url, alt: i.alt })),
+    bundle_items: (bundle ?? []).map((b) => ({ label: b.label, subcategory_id: b.subcategory_id, qty: b.qty })),
   };
 }

@@ -53,7 +53,7 @@ async function Categories() {
           }}
           subcategories={(subs ?? [])
             .filter((s) => s.category_id === c.id)
-            .map((s) => ({ id: s.id, name: s.name, slug: s.slug, kind: s.kind, description: s.description ?? "" }))}
+            .map((s) => ({ id: s.id, name: s.name, slug: s.slug, kind: s.kind, description: s.description ?? "", footerNote: s.footer_note ?? "" }))}
         />
       ))}
     </div>

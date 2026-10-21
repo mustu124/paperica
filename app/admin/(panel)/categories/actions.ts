@@ -75,7 +75,12 @@ export async function moveSubcategory(id: string, direction: "up" | "down"): Pro
   return reorder("subcategories", (data ?? []).map((s) => s.id), id, direction);
 }
 
-const subInput = z.object({ name: z.string().trim().min(1, "Enter a name").max(60), description: z.string().trim().max(500) });
+const subInput = z.object({
+  name: z.string().trim().min(1, "Enter a name").max(60),
+  description: z.string().trim().max(500),
+  /** Omitted = leave unchanged (also keeps saving working before the gift-sets migration). */
+  footer_note: z.string().trim().max(2000).optional(),
+});
 
 export async function saveSubcategory(id: string, input: z.input<typeof subInput>): Promise<ActionResult> {
   const admin = await requireAdmin();
@@ -84,7 +89,11 @@ export async function saveSubcategory(id: string, input: z.input<typeof subInput
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Please check the form." };
   const { error } = await admin.supabase
     .from("subcategories")
-    .update({ name: parsed.data.name, description: parsed.data.description || null })
+    .update({
+      name: parsed.data.name,
+      description: parsed.data.description || null,
+      ...(parsed.data.footer_note !== undefined ? { footer_note: parsed.data.footer_note || null } : {}),
+    })
     .eq("id", id);
   if (error) return { ok: false, error: friendlyError(error) };
   refreshMenu();

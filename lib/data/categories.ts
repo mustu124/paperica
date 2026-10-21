@@ -21,6 +21,8 @@ export type SubcategoryNode = {
   slug: string;
   kind: SubcategoryKind;
   description: string | null;
+  /** Note at the bottom of the collection page (e.g. Gift Sets → "A little note before you order"). */
+  footerNote: string | null;
   href: string;
 };
 
@@ -35,7 +37,8 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
     supabase.from("categories").select("id, name, slug, description, sort_order").order("sort_order"),
     supabase
       .from("subcategories")
-      .select("id, category_id, name, slug, kind, description, sort_order")
+      // "*" so the tree still loads on a database without the footer_note column yet.
+      .select("*")
       .order("sort_order"),
   ]);
   if (cats.error || subs.error) {
@@ -58,6 +61,7 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
         slug: s.slug,
         kind: s.kind,
         description: s.description,
+        footerNote: s.footer_note ?? null,
         href: subcategoryHref(c.slug, s),
       })),
   }));
