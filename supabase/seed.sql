@@ -32,8 +32,7 @@ insert into public.categories (name, slug, sort_order, show_in_menu, image_url, 
    '[{"url":"/placeholders/products/placeholder-notepad-trio-1.svg","alt":"Replace me: placeholder notepads","label":"Notepads","link_url":"/collections/paper-edit/notepads"},
      {"url":"/placeholders/products/placeholder-sticky-notes-1.svg","alt":"Replace me: placeholder sticky notes","label":"Sticky Notes","link_url":"/collections/paper-edit/sticky-notes"}]'),
   ('GIFTS', 'gifts', 5, true, '/placeholders/categories/gifts.svg', 'buy',
-   '[{"url":"/placeholders/products/placeholder-softcover-notebook-set-1.svg","alt":"Replace me: placeholder gift set","label":"Gift Sets","link_url":"/collections/gifts/gift-sets"},
-     {"url":"/placeholders/products/placeholder-weekly-planner-1.svg","alt":"Replace me: placeholder gift","label":"Gifts Under ₹1,000","link_url":"/collections/gifts/gifts-under-1000"}]'),
+   '[{"url":"/placeholders/products/placeholder-softcover-notebook-set-1.svg","alt":"Replace me: placeholder gift set","label":"Gift Sets","link_url":"/collections/gifts/gift-sets"}]'),
   ('PERSONALISED', 'personalised', 6, true, '/placeholders/categories/personalised.svg', 'whatsapp',
    '[{"url":"/placeholders/products/placeholder-custom-name-notebook-1.svg","alt":"Replace me: placeholder custom notebook","label":"Custom Notebooks","link_url":"/collections/personalised/custom-notebooks"},
      {"url":"/placeholders/products/placeholder-custom-planner-1.svg","alt":"Replace me: placeholder custom planner","label":"Corporate Gifting","link_url":"/collections/personalised/corporate-gifting"}]')
@@ -68,9 +67,8 @@ from (values
   ('paper-edit', 'Snap-in Separators', 'snap-in-separators', 3, 'manual'),
   ('paper-edit', 'Sticky Notes',       'sticky-notes',       4, 'manual'),
 
-  ('gifts', 'View All',           'view-all',           1, 'view_all'),
-  ('gifts', 'Gift Sets',          'gift-sets',          2, 'manual'),
-  ('gifts', 'Gifts Under ₹1,000', 'gifts-under-1000',   3, 'filter_under_1000'),
+  -- GIFTS lists only the gift sets (Catalogue V3 §5); on the live shop each set has its own item.
+  ('gifts', 'Gift Sets',          'gift-sets',          1, 'manual'),
 
   ('personalised', 'Custom Notebooks',  'custom-notebooks',  1, 'manual'),
   ('personalised', 'Custom Planners',   'custom-planners',   2, 'manual'),
