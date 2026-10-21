@@ -69,6 +69,8 @@ const nextConfig: NextConfig = {
       // NEW IN is the new collection: its "New Collection" link opens the NEW IN page itself.
       { source: "/collections/new-in/new-collection", destination: "/collections/new-in", permanent: false },
       { source: "/new-in/new-collection", destination: "/collections/new-in", permanent: false },
+      // Product renamed (spelling fix); keeps links shared under the old address working.
+      { source: "/products/unmatchaabl", destination: "/products/unmatchaable", permanent: true },
     ];
   },
   async rewrites() {
