@@ -60,6 +60,7 @@ export async function EnquiryPage({ slug }: { slug: string }) {
   return (
     <>
       <ContentShell
+        wide={Boolean(form?.gallery.length)}
         title={page.title}
         crumbs={[
           { label: "Home", href: "/" },
@@ -69,20 +70,31 @@ export async function EnquiryPage({ slug }: { slug: string }) {
       >
         {form ? (
           <>
-            <Prose html={renderTokens(page.body_html, settings)} />
-            {form.gallery.length > 0 && (
-              <ul className="mt-10 grid grid-cols-2 gap-3 md:gap-4">
-                {form.gallery.map((img, i) => (
-                  <li key={img.url} className={form.gallery.length % 2 === 1 && i === form.gallery.length - 1 ? "col-span-2" : undefined}>
-                    <figure>
-                      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-blush">
-                        <Image src={img.url} alt={img.alt} fill sizes="(min-width: 808px) 380px, 50vw" className="object-cover" />
-                      </div>
-                      {img.caption && <figcaption className="mt-2 text-sm font-medium">{img.caption}</figcaption>}
-                    </figure>
-                  </li>
-                ))}
-              </ul>
+            {form.gallery.length > 0 ? (
+              // Write-up beside the photos (photos stay in view while reading); stacked on phones.
+              <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
+                <Prose html={renderTokens(page.body_html, settings)} className="[&>h2:first-child]:mt-0" />
+                <ul className="grid grid-cols-2 gap-3 self-start md:gap-4 lg:sticky lg:top-36">
+                  {form.gallery.map((img, i) => (
+                    <li key={img.url} className={form.gallery.length % 2 === 1 && i === form.gallery.length - 1 ? "col-span-2" : undefined}>
+                      <figure>
+                        <div
+                          className={
+                            form.gallery.length % 2 === 1 && i === form.gallery.length - 1
+                              ? "relative aspect-[16/10] overflow-hidden rounded-2xl bg-blush"
+                              : "relative aspect-[4/5] overflow-hidden rounded-2xl bg-blush"
+                          }
+                        >
+                          <Image src={img.url} alt={img.alt} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover" />
+                        </div>
+                        {img.caption && <figcaption className="mt-2 text-sm font-medium">{img.caption}</figcaption>}
+                      </figure>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <Prose html={renderTokens(page.body_html, settings)} />
             )}
             <section id="quote" aria-label="Enquiry form" className="mt-12 scroll-mt-32 border border-taupe bg-white/70 p-5 md:p-8">
               {form.form === "custom_order" ? (
