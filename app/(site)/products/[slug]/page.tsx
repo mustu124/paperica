@@ -22,7 +22,7 @@ import { openGraphDefaults, shareImages } from "@/lib/seo";
 import { NO_MATCH_PARAM, withFallback } from "@/lib/static-params";
 import { getSiteSettings } from "@/lib/data/settings";
 import { titleCase } from "@/lib/format";
-import { settingNumber, settingString } from "@/lib/settings";
+import { settingString } from "@/lib/settings";
 import { siteUrl } from "@/lib/site-url";
 
 type Props = PageProps<"/products/[slug]">;
@@ -105,8 +105,6 @@ async function ProductContent({ params }: Pick<Props, "params">) {
   const s = (key: string) => renderTokensText(settingString(settings, key), settings);
 
   const copy: PanelCopy = {
-    lowStockThreshold: settingNumber(settings, "low_stock_threshold") ?? 5,
-    lowStockMessage: s("low_stock_message"),
     deliveryBadges: [s("delivery_badge_dispatch") || s("ready_stock_dispatch_text"), s("delivery_badge_delivery") || s("ready_stock_delivery_text")].filter(Boolean),
     priceNote: s("product_price_note"),
     paymentNote: s("payment_note"),
@@ -184,7 +182,6 @@ async function ProductContent({ params }: Pick<Props, "params">) {
               isNew: product.is_new,
               trackStock: product.track_stock,
               stockQty: product.stock_qty,
-              lowStockMessage: product.low_stock_message,
               image: product.images[0]?.url ?? null,
             }}
             variants={product.variants.map((v) => ({

@@ -78,28 +78,6 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
       { key: "grievance_acknowledgement_time", label: "Acknowledgement time", type: "text", hint: "e.g. 48 hours" },
     ],
   },
-  {
-    title: "Messages & templates",
-    description: "Small pieces of text used around the shop.",
-    fields: [
-      { key: "brand_name", label: "Shop name", type: "text" },
-      { key: "tagline", label: "Tagline", type: "text" },
-      { key: "cart_message", label: "Cart note", type: "text" },
-      { key: "delivery_badge_dispatch", label: "Product page: dispatch badge", type: "text" },
-      { key: "delivery_badge_delivery", label: "Product page: delivery badge", type: "text" },
-      { key: "low_stock_threshold", label: "Show “Selling Fast” at or below (stock)", type: "number" },
-      { key: "low_stock_message", label: "“Selling Fast” message", type: "text" },
-      { key: "product_price_note", label: "Note under the price", type: "text", hint: "Links like [Shipping](/shipping-policy) work." },
-      { key: "payment_note", label: "Payment note", type: "text" },
-      { key: "personalised_info_text", label: "Personalised products: info box", type: "textarea" },
-      { key: "returns_summary_text", label: "Product page: returns summary", type: "textarea" },
-      { key: "checkout_serviceability_note", label: "Checkout: serviceability note", type: "text" },
-      { key: "checkout_same_day_note", label: "Checkout: same-day note", type: "text" },
-      { key: "order_thank_you_text", label: "Order confirmation: thank-you text", type: "textarea" },
-      { key: "whatsapp_customise_template", label: "“Customise on WhatsApp” message", type: "textarea", hint: "{product} and {url} are filled in." },
-      { key: "whatsapp_enquiry_intro", label: "Contact form WhatsApp first line", type: "text", hint: "{type} = enquiry type" },
-    ],
-  },
 ];
 
 export const ALL_SETTING_FIELDS = SETTINGS_GROUPS.flatMap((g) => g.fields);

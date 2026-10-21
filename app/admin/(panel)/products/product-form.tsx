@@ -433,9 +433,6 @@ export function ProductForm({
 
           <Card title="Stock">
             <div className="space-y-4">
-              <Field label="SKU">
-                <input value={v.sku} onChange={(e) => set("sku", e.target.value)} className={inputCls} />
-              </Field>
               {isBundle ? (
                 <p className="rounded-md bg-butter/60 px-3 py-2 text-sm">
                   Gift set: {initial.bundle_items.length ? <strong>{initial.stock_qty ?? 0} available</strong> : "available"} — worked out from the
@@ -446,14 +443,9 @@ export function ProductForm({
                 <Toggle checked={v.track_stock} onChange={(x) => set("track_stock", x)} label="Track stock" />
               )}
               {!isBundle && v.track_stock && (
-                <>
-                  <Field label="Stock quantity" hint={v.variants.length ? "Options with their own stock use that instead." : undefined}>
-                    <input type="number" min={0} value={stockText} onChange={(e) => setStockText(e.target.value)} className={inputCls} />
-                  </Field>
-                  <Field label="Low-stock message" hint="Optional — overrides the default “Selling Fast” line.">
-                    <input value={v.low_stock_message} onChange={(e) => set("low_stock_message", e.target.value)} className={inputCls} />
-                  </Field>
-                </>
+                <Field label="Stock quantity" hint={v.variants.length ? "Options with their own stock use that instead." : undefined}>
+                  <input type="number" min={0} value={stockText} onChange={(e) => setStockText(e.target.value)} className={inputCls} />
+                </Field>
               )}
             </div>
           </Card>

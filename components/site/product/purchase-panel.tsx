@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Flame, Package, Truck } from "lucide-react";
+import { Package, Truck } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -33,13 +33,10 @@ export type PanelProduct = {
   isNew: boolean;
   trackStock: boolean;
   stockQty: number | null;
-  lowStockMessage: string | null;
   image: string | null;
 };
 
 export type PanelCopy = {
-  lowStockThreshold: number;
-  lowStockMessage: string;
   deliveryBadges: string[];
   priceNote: string;
   paymentNote: string;
@@ -72,7 +69,6 @@ export function PurchasePanel({
   // Stock for the current selection (null = not tracked / unlimited).
   const available = product.trackStock ? (variant?.stockQty ?? product.stockQty ?? 0) : null;
   const soldOut = !isWhatsapp && available !== null && available <= 0;
-  const lowStock = !isWhatsapp && available !== null && available > 0 && available <= copy.lowStockThreshold;
   const price = variant?.priceOverride ?? product.price;
   const variantLabel = variant ? `${variant.group}: ${variant.label}` : null;
 
@@ -198,13 +194,6 @@ export function PurchasePanel({
         )}
         <h1 className="font-serif text-3xl font-semibold leading-tight md:text-4xl">{product.name}</h1>
       </div>
-
-      {lowStock && (
-        <p className="flex items-center gap-2 text-sm text-chilli">
-          <Flame className="size-4" aria-hidden />
-          {product.lowStockMessage || copy.lowStockMessage}
-        </p>
-      )}
 
       {!isWhatsapp && copy.deliveryBadges.length > 0 && (
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
