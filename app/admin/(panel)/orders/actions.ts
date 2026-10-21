@@ -6,13 +6,13 @@ import { friendlyError, NOT_AUTHORISED, requireAdmin, type ActionResult } from "
 
 const orderUpdate = z.object({
   dispatch_status: z.enum(["processing", "dispatched", "delivered", "cancelled"]),
-  courier_name: z.string().trim().max(100),
-  tracking_details: z.string().trim().max(1000),
+  /** Shown to the customer on Track Your Order (stored in tracking_details). */
+  receipt_id: z.string().trim().max(200),
   mark_refunded: z.boolean(),
 });
 
 /**
- * Saves dispatch status, courier and tracking. Payment status can only be moved to
+ * Saves dispatch status and the receipt ID. Payment status can only be moved to
  * "refunded" (refunds themselves are made in the Razorpay dashboard).
  */
 export async function updateOrder(id: string, input: z.input<typeof orderUpdate>): Promise<ActionResult> {
@@ -24,8 +24,7 @@ export async function updateOrder(id: string, input: z.input<typeof orderUpdate>
 
   const patch: TablesUpdate<"orders"> = {
     dispatch_status: v.dispatch_status,
-    courier_name: v.courier_name || null,
-    tracking_details: v.tracking_details || null,
+    tracking_details: v.receipt_id || null,
   };
   if (v.mark_refunded) patch.payment_status = "refunded";
 

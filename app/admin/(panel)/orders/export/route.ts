@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
   const header = [
     "Order number", "Date", "Customer", "Email", "Phone", "Address line 1", "Address line 2", "City", "State", "PIN code",
-    "Items", "Subtotal", "Shipping", "Total", "Payment status", "Dispatch status", "Courier", "Tracking", "Razorpay payment id", "Note",
+    "Items", "Subtotal", "Shipping", "Total", "Payment status", "Dispatch status", "Receipt ID", "Razorpay payment id", "Note",
   ];
   const rows = (data ?? []).map((o) => {
     const lines = items
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     return [
       o.order_number, o.created_at, o.customer_name, o.customer_email, o.customer_phone, o.shipping_address_line1,
       o.shipping_address_line2, o.city, o.state, o.pincode, lines, o.subtotal_inr, o.shipping_inr, o.total_inr,
-      o.payment_status, o.dispatch_status, o.courier_name, o.tracking_details, o.razorpay_payment_id, o.notes,
+      o.payment_status, o.dispatch_status, o.tracking_details, o.razorpay_payment_id, o.notes,
     ].map(csvCell).join(",");
   });
 

@@ -9,7 +9,6 @@ type Result = {
   placedAt: string;
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
   dispatchStatus: "processing" | "dispatched" | "delivered" | "cancelled";
-  courierName: string | null;
   trackingDetails: string | null;
   total: number;
   items: { product_name: string; variant_label: string | null; qty: number }[];
@@ -102,15 +101,9 @@ export function TrackOrderForm() {
                 <dt className="text-ink-muted">Order status</dt>
                 <dd className="font-medium">{DISPATCH[result.dispatchStatus]}</dd>
               </div>
-              {result.courierName && (
-                <div>
-                  <dt className="text-ink-muted">Courier</dt>
-                  <dd>{result.courierName}</dd>
-                </div>
-              )}
               {result.trackingDetails && (
                 <div className="sm:col-span-2">
-                  <dt className="text-ink-muted">Tracking details</dt>
+                  <dt className="text-ink-muted">Receipt ID</dt>
                   <dd className="whitespace-pre-line break-words">{result.trackingDetails}</dd>
                 </div>
               )}

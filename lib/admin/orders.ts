@@ -40,16 +40,3 @@ export function orderSearchFilter(q: string) {
   return parts.join(",");
 }
 
-/** Fills the tracking WhatsApp template ({name} {order_number} {status} {courier} {tracking}). */
-export function trackingMessage(
-  template: string,
-  o: { customer_name: string; order_number: string; dispatch_status: string; courier_name: string | null; tracking_details: string | null },
-) {
-  const status = DISPATCH_OPTIONS.find((d) => d.value === o.dispatch_status)?.label.toLowerCase() ?? o.dispatch_status;
-  return (template || "Hi {name}! Update on your order {order_number}: {status}. {courier} {tracking}")
-    .replaceAll("{name}", o.customer_name.split(" ")[0])
-    .replaceAll("{order_number}", o.order_number)
-    .replaceAll("{status}", status)
-    .replaceAll("{courier}", o.courier_name || "—")
-    .replaceAll("{tracking}", o.tracking_details || "—");
-}

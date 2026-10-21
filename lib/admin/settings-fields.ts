@@ -114,7 +114,6 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
       { key: "checkout_same_day_note", label: "Checkout: same-day note", type: "text" },
       { key: "order_thank_you_text", label: "Order confirmation: thank-you text", type: "textarea" },
       { key: "whatsapp_customise_template", label: "“Customise on WhatsApp” message", type: "textarea", hint: "{product} and {url} are filled in." },
-      { key: "whatsapp_tracking_template", label: "Order tracking WhatsApp message", type: "textarea", hint: "{name} {order_number} {status} {courier} {tracking}" },
       { key: "whatsapp_enquiry_intro", label: "Contact form WhatsApp first line", type: "text", hint: "{type} = enquiry type" },
     ],
   },

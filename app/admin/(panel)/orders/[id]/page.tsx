@@ -32,10 +32,9 @@ async function OrderDetail({ params }: Props) {
   if (!admin) return null;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
 
-  const [{ data: order }, { data: items }, { data: setting }] = await Promise.all([
+  const [{ data: order }, { data: items }] = await Promise.all([
     admin.supabase.from("orders").select("*").eq("id", id).maybeSingle(),
     admin.supabase.from("order_items").select("*").eq("order_id", id),
-    admin.supabase.from("site_settings").select("value").eq("key", "whatsapp_tracking_template").maybeSingle(),
   ]);
   if (!order) notFound();
   if ((order.payment_status === "pending" || order.payment_status === "failed") && (await reconcileOrder(order)) === "paid") {
@@ -157,10 +156,7 @@ async function OrderDetail({ params }: Props) {
               </div>
             )}
           </Card>
-          <OrderManager
-            order={order}
-            trackingTemplate={typeof setting?.value === "string" ? setting.value : ""}
-          />
+          <OrderManager order={order} />
         </div>
       </div>
     </div>

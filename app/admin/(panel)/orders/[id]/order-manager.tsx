@@ -5,9 +5,7 @@ import { useState } from "react";
 import { Card, Field, inputCls, Toggle } from "@/components/admin/ui";
 import { useSave } from "@/components/admin/use-save";
 import { Button } from "@/components/ui/button";
-import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
-import { DISPATCH_OPTIONS, trackingMessage } from "@/lib/admin/orders";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { DISPATCH_OPTIONS } from "@/lib/admin/orders";
 import type { DispatchStatus, PaymentStatus } from "@/types/db";
 import { updateOrder } from "../actions";
 
@@ -29,39 +27,25 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
   );
 }
 
-/** Dispatch status, courier/tracking fields, refunded flag and the WhatsApp tracking message. */
+/** Dispatch status, the receipt ID the customer sees on Track Your Order, and the refunded flag. */
 export function OrderManager({
   order,
-  trackingTemplate,
 }: {
   order: {
     id: string;
-    order_number: string;
-    customer_name: string;
-    customer_phone: string;
     payment_status: PaymentStatus;
     dispatch_status: DispatchStatus;
-    courier_name: string | null;
+    /** Receipt ID (stored in orders.tracking_details). */
     tracking_details: string | null;
   };
-  trackingTemplate: string;
 }) {
   const [dispatch, setDispatch] = useState<DispatchStatus>(order.dispatch_status);
-  const [courier, setCourier] = useState(order.courier_name ?? "");
-  const [tracking, setTracking] = useState(order.tracking_details ?? "");
+  const [receipt, setReceipt] = useState(order.tracking_details ?? "");
   const [refunded, setRefunded] = useState(order.payment_status === "refunded");
   const { run, pending } = useSave();
 
-  const message = trackingMessage(trackingTemplate, {
-    customer_name: order.customer_name,
-    order_number: order.order_number,
-    dispatch_status: dispatch,
-    courier_name: courier,
-    tracking_details: tracking,
-  });
-
   return (
-    <Card title="Dispatch & tracking" className="print:hidden">
+    <Card title="Dispatch" className="print:hidden">
       <form
         className="space-y-4"
         onSubmit={(e) => {
@@ -70,8 +54,7 @@ export function OrderManager({
             () =>
               updateOrder(order.id, {
                 dispatch_status: dispatch,
-                courier_name: courier,
-                tracking_details: tracking,
+                receipt_id: receipt,
                 mark_refunded: refunded && order.payment_status !== "refunded",
               }),
             "Order updated",
@@ -87,11 +70,8 @@ export function OrderManager({
             ))}
           </select>
         </Field>
-        <Field label="Courier name">
-          <input value={courier} onChange={(e) => setCourier(e.target.value)} placeholder="e.g. Delhivery, DTDC, Borzo" className={inputCls} />
-        </Field>
-        <Field label="Tracking details" hint="Tracking number and/or link. The customer sees this on Track Your Order.">
-          <textarea value={tracking} onChange={(e) => setTracking(e.target.value)} rows={3} className={inputCls} />
+        <Field label="Receipt ID" hint="The customer sees this on Track Your Order.">
+          <input value={receipt} onChange={(e) => setReceipt(e.target.value)} className={inputCls} />
         </Field>
         {(order.payment_status === "paid" || order.payment_status === "refunded") && (
           <div className="rounded-md bg-paper/50 p-3">
@@ -103,21 +83,9 @@ export function OrderManager({
             />
           </div>
         )}
-        <div className="flex flex-col gap-2">
-          <Button type="submit" size="lg" disabled={pending}>
-            {pending ? "Saving…" : "Save changes"}
-          </Button>
-          <a
-            href={whatsappUrl(`91${order.customer_phone}`, message)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-none border border-stem-deep px-6 text-[0.8125rem] font-medium uppercase tracking-[0.14em] text-stem-deep hover:bg-stem-deep hover:text-white"
-          >
-            <WhatsAppIcon />
-            Open WhatsApp
-          </a>
-        </div>
-        <p className="text-xs text-ink-muted">WhatsApp opens with: “{message.split("\n")[0]}…”. Save first if you changed the details.</p>
+        <Button type="submit" size="lg" disabled={pending}>
+          {pending ? "Saving…" : "Save changes"}
+        </Button>
       </form>
     </Card>
   );

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   const { data: order } = await supabase
     .from("orders")
-    .select("id, order_number, customer_email, customer_phone, payment_status, dispatch_status, courier_name, tracking_details, total_inr, created_at")
+    .select("id, order_number, customer_email, customer_phone, payment_status, dispatch_status, tracking_details, total_inr, created_at")
     .eq("order_number", orderNumber)
     .maybeSingle();
 
@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
       placedAt: order.created_at,
       paymentStatus: order.payment_status,
       dispatchStatus: order.dispatch_status,
-      courierName: order.courier_name,
       trackingDetails: order.tracking_details,
       total: Number(order.total_inr),
       items: items ?? [],

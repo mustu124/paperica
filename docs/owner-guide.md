@@ -188,18 +188,16 @@ To change the choices or the indicative prices:
 
 ---
 
-## Mark an order as dispatched and add tracking
+## Mark an order as dispatched
 
 1. Go to **Orders**. Paid orders are under **Confirmed (paid)**. Tap the order number.
 2. Tap **Copy address** to paste the address into your courier's website. **Packing slip** prints a slip without prices.
-3. Under **Dispatch & tracking**:
+3. Under **Dispatch**:
    - Set **Dispatch status** to **Dispatched**.
-   - Type the **Courier name** (for example, Delhivery).
-   - In **Tracking details**, paste the tracking number and/or tracking link.
+   - Type the **Receipt ID** you want to give the customer.
 4. Tap **Save changes**.
-5. Tap **Open WhatsApp** to send the customer a ready-made message with the courier and tracking details. Check it, then press send.
 
-Customers can also see the status and tracking themselves on the **Track Your Order** page, using their order number and the mobile number or email they used at checkout.
+Customers see the status and the receipt ID on the **Track Your Order** page, using their order number and the mobile number or email they used at checkout.
 
 When the parcel arrives, set the status to **Delivered** and save.
 
