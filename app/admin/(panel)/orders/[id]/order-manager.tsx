@@ -27,7 +27,7 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
   );
 }
 
-/** Dispatch status, the receipt ID the customer sees on Track Your Order, and the refunded flag. */
+/** Dispatch status and the refunded flag. */
 export function OrderManager({
   order,
 }: {
@@ -35,12 +35,9 @@ export function OrderManager({
     id: string;
     payment_status: PaymentStatus;
     dispatch_status: DispatchStatus;
-    /** Receipt ID (stored in orders.tracking_details). */
-    tracking_details: string | null;
   };
 }) {
   const [dispatch, setDispatch] = useState<DispatchStatus>(order.dispatch_status);
-  const [receipt, setReceipt] = useState(order.tracking_details ?? "");
   const [refunded, setRefunded] = useState(order.payment_status === "refunded");
   const { run, pending } = useSave();
 
@@ -54,7 +51,6 @@ export function OrderManager({
             () =>
               updateOrder(order.id, {
                 dispatch_status: dispatch,
-                receipt_id: receipt,
                 mark_refunded: refunded && order.payment_status !== "refunded",
               }),
             "Order updated",
@@ -69,9 +65,6 @@ export function OrderManager({
               </option>
             ))}
           </select>
-        </Field>
-        <Field label="Receipt ID" hint="The customer sees this on Track Your Order.">
-          <input value={receipt} onChange={(e) => setReceipt(e.target.value)} className={inputCls} />
         </Field>
         {(order.payment_status === "paid" || order.payment_status === "refunded") && (
           <div className="rounded-md bg-paper/50 p-3">

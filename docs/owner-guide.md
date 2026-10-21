@@ -194,10 +194,9 @@ To change the choices or the indicative prices:
 2. Tap **Copy address** to paste the address into your courier's website. **Packing slip** prints a slip without prices.
 3. Under **Dispatch**:
    - Set **Dispatch status** to **Dispatched**.
-   - Type the **Receipt ID** you want to give the customer.
 4. Tap **Save changes**.
 
-Customers see the status and the receipt ID on the **Track Your Order** page, using their order number and the mobile number or email they used at checkout.
+Customers see the status on the **Track Your Order** page, using their order number and the mobile number or email they used at checkout.
 
 When the parcel arrives, set the status to **Delivered** and save.
 
