@@ -45,16 +45,6 @@ export const SETTINGS_GROUPS: { title: string; description?: string; fields: Set
     ],
   },
   {
-    title: "Free gift offer",
-    description: "Buying enough products marked New adds one free item to the order at checkout.",
-    fields: [
-      { key: "gift_offer_enabled", label: "Offer is on", type: "bool" },
-      { key: "gift_offer_text", label: "Offer text", type: "text", hint: "Shown on the products it applies to (New products), in the cart and at checkout." },
-      { key: "gift_offer_min_qty", label: "New products needed", type: "number", hint: "e.g. 2 — the free item itself doesn't count." },
-      { key: "gift_offer_product_slug", label: "Free product (web address)", type: "text", hint: "The end of the product's link, e.g. snap-in-separators" },
-    ],
-  },
-  {
     title: "Shipping & delivery",
     description: "Used on product pages, checkout, policies and FAQs.",
     fields: [

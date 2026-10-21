@@ -1,4 +1,5 @@
 import "server-only";
+import { activeOffers, countsTowards, todayInIndia, type Offer } from "@/lib/offer";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { CartItemInput } from "./schema";
 
@@ -29,13 +30,12 @@ export type QuoteIssue = {
 };
 
 /**
- * Free-gift offer (site settings gift_offer_*): buying `minQty` products marked New adds one
- * free `gift_offer_product_slug` to the order.
+ * A free-gift offer (Admin → Offers) the cart is working towards:
  *   applied      the free item is in `lines`
- *   add_more     `remaining` more New products needed
+ *   add_more     `remaining` more qualifying products needed
  *   unavailable  the free item is sold out or hidden, so it can't be added
  */
-export type QuoteOffer = { text: string; status: "applied" | "add_more" | "unavailable"; remaining: number };
+export type QuoteOffer = { id: string; text: string; status: "applied" | "add_more" | "unavailable"; remaining: number };
 
 export type Quote = {
   lines: QuoteLine[];
@@ -44,7 +44,8 @@ export type Quote = {
   shipping: number;
   total: number;
   freeShippingThreshold: number | null;
-  offer: QuoteOffer | null;
+  /** Offers with at least one qualifying product in the cart. */
+  offers: QuoteOffer[];
 };
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -83,6 +84,8 @@ export async function priceItems(items: CartItemInput[]): Promise<Quote> {
       .in("key", [
         "standard_shipping_fee_inr",
         "free_shipping_threshold_inr",
+        "offers",
+        // older single-offer settings (read when "offers" isn't set yet)
         "gift_offer_enabled",
         "gift_offer_text",
         "gift_offer_min_qty",
@@ -156,7 +159,11 @@ export async function priceItems(items: CartItemInput[]): Promise<Quote> {
   const threshold = toNum(setting("free_shipping_threshold_inr"));
   if (fee == null || Number.isNaN(fee)) console.warn("[checkout] standard_shipping_fee_inr is not set; charging no shipping");
 
-  const offer = await applyGiftOffer(lines, productRows, setting, toNum);
+  const offers = await applyOffers(
+    lines,
+    productRows,
+    activeOffers(Object.fromEntries(settingRows.map((r) => [r.key, r.value])), todayInIndia()),
+  );
 
   const subtotal = round2(lines.reduce((s, l) => s + l.lineTotal, 0));
   const shipping =
@@ -169,67 +176,97 @@ export async function priceItems(items: CartItemInput[]): Promise<Quote> {
     shipping: round2(shipping),
     total: round2(subtotal + shipping),
     freeShippingThreshold: threshold,
-    offer,
+    offers,
   };
 }
 
-/** Adds the free gift line when the cart qualifies (see QuoteOffer). Mutates `lines`. */
-async function applyGiftOffer(
+/** Adds a free line for every offer the cart qualifies for (see QuoteOffer). Mutates `lines`. */
+async function applyOffers(
   lines: QuoteLine[],
-  productRows: { id: string; is_new: boolean }[],
-  setting: (k: string) => unknown,
-  toNum: (v: unknown) => number | null,
-): Promise<QuoteOffer | null> {
-  const enabled = setting("gift_offer_enabled") === true || setting("gift_offer_enabled") === "true";
-  const slug = typeof setting("gift_offer_product_slug") === "string" ? (setting("gift_offer_product_slug") as string).trim() : "";
-  const text = typeof setting("gift_offer_text") === "string" ? (setting("gift_offer_text") as string).trim() : "";
-  const minQty = Math.max(1, Math.floor(toNum(setting("gift_offer_min_qty")) ?? 2));
-  if (!enabled || !slug || lines.length === 0) return null;
-
+  productRows: { id: string; slug: string; mode: string; is_new: boolean }[],
+  offers: Offer[],
+): Promise<QuoteOffer[]> {
+  if (offers.length === 0 || lines.length === 0) return [];
   const supabase = createPublicClient(); // RLS: active products only
-  const { data: gift, error } = await supabase
-    .from("products")
-    .select("id, name, slug, track_stock, stock_qty")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw new Error(`Gift lookup failed: ${error.message}`);
 
-  // The free item itself never counts towards the offer.
-  const isNew = new Set(productRows.filter((p) => p.is_new && p.id !== gift?.id).map((p) => p.id));
-  const qualifying = lines.reduce((n, l) => n + (isNew.has(l.productId) ? l.qty : 0), 0);
-  if (qualifying === 0) return null;
-  if (qualifying < minQty) return { text, status: "add_more", remaining: minQty - qualifying };
-  if (!gift) return { text, status: "unavailable", remaining: 0 };
+  // Where each cart product sits (sections and menu heads), for section/head offers.
+  const ids = productRows.map((p) => p.id);
+  const { data: links, error: linkError } = await supabase.from("product_subcategories").select("product_id, subcategory_id").in("product_id", ids);
+  if (linkError) throw new Error(`Offer lookup failed: ${linkError.message}`);
+  const subIds = [...new Set((links ?? []).map((l) => l.subcategory_id))];
+  const { data: subs, error: subError } = subIds.length
+    ? await supabase.from("subcategories").select("id, category_id").in("id", subIds)
+    : { data: [], error: null };
+  if (subError) throw new Error(`Offer lookup failed: ${subError.message}`);
+  const categoryOf = new Map((subs ?? []).map((s) => [s.id, s.category_id]));
+  const products = new Map(
+    productRows.map((p) => {
+      const mine = (links ?? []).filter((l) => l.product_id === p.id).map((l) => l.subcategory_id);
+      return [
+        p.id,
+        { id: p.id, slug: p.slug, mode: p.mode, isNew: p.is_new, subcategoryIds: mine, categoryIds: mine.flatMap((s) => categoryOf.get(s) ?? []) },
+      ];
+    }),
+  );
 
-  // Stock left after what the customer is already buying of the same item.
-  const inCart = (variantId: string | null) =>
-    lines.filter((l) => l.productId === gift.id && l.variantId === variantId).reduce((n, l) => n + l.qty, 0);
-  const [variantRes, imageRes] = await Promise.all([
-    supabase.from("product_variants").select("id, label, option_group, stock_qty").eq("product_id", gift.id).order("sort_order"),
-    supabase.from("product_images").select("url").eq("product_id", gift.id).order("sort_order").limit(1),
-  ]);
-  if (variantRes.error || imageRes.error) throw new Error(`Gift lookup failed: ${(variantRes.error ?? imageRes.error)?.message}`);
-  const variants = variantRes.data ?? [];
-  const pick = variants.length
-    ? variants.find((v) => !gift.track_stock || (v.stock_qty ?? gift.stock_qty ?? 0) - inCart(v.id) >= 1)
-    : !gift.track_stock || (gift.stock_qty ?? 0) - inCart(null) >= 1
-      ? null
-      : undefined;
-  if (pick === undefined) return { text, status: "unavailable", remaining: 0 };
+  const results: QuoteOffer[] = [];
+  for (const offer of offers) {
+    const qualifying = lines.reduce((n, l) => {
+      const p = products.get(l.productId);
+      return n + (!l.free && p && countsTowards(offer, p) ? l.qty : 0);
+    }, 0);
+    if (qualifying === 0) continue;
+    const base = { id: offer.id, text: offer.text };
+    if (qualifying < offer.min_qty) {
+      results.push({ ...base, status: "add_more", remaining: offer.min_qty - qualifying });
+      continue;
+    }
 
-  lines.push({
-    key: `gift:${gift.id}`,
-    productId: gift.id,
-    variantId: pick?.id ?? null,
-    name: gift.name,
-    variantLabel: pick ? `${pick.option_group}: ${pick.label}` : null,
-    slug: gift.slug,
-    image: imageRes.data?.[0]?.url ?? null,
-    unitPrice: 0,
-    qty: 1,
-    lineTotal: 0,
-    maxQty: null,
-    free: true,
-  });
-  return { text, status: "applied", remaining: 0 };
+    const giftQuery = supabase.from("products").select("id, name, slug, track_stock, stock_qty");
+    const { data: gift, error } = await (offer.gift_product_id
+      ? giftQuery.eq("id", offer.gift_product_id)
+      : giftQuery.eq("slug", offer.gift_slug)
+    ).maybeSingle();
+    if (error) throw new Error(`Gift lookup failed: ${error.message}`);
+    if (!gift) {
+      results.push({ ...base, status: "unavailable", remaining: 0 });
+      continue;
+    }
+
+    // Stock left after what's already in the order (bought, or free from another offer).
+    const inCart = (variantId: string | null) =>
+      lines.filter((l) => l.productId === gift.id && l.variantId === variantId).reduce((n, l) => n + l.qty, 0);
+    const [variantRes, imageRes] = await Promise.all([
+      supabase.from("product_variants").select("id, label, option_group, stock_qty").eq("product_id", gift.id).order("sort_order"),
+      supabase.from("product_images").select("url").eq("product_id", gift.id).order("sort_order").limit(1),
+    ]);
+    if (variantRes.error || imageRes.error) throw new Error(`Gift lookup failed: ${(variantRes.error ?? imageRes.error)?.message}`);
+    const variants = variantRes.data ?? [];
+    const pick = variants.length
+      ? variants.find((v) => !gift.track_stock || (v.stock_qty ?? gift.stock_qty ?? 0) - inCart(v.id) >= 1)
+      : !gift.track_stock || (gift.stock_qty ?? 0) - inCart(null) >= 1
+        ? null
+        : undefined;
+    if (pick === undefined) {
+      results.push({ ...base, status: "unavailable", remaining: 0 });
+      continue;
+    }
+
+    lines.push({
+      key: `gift:${offer.id}:${gift.id}`,
+      productId: gift.id,
+      variantId: pick?.id ?? null,
+      name: gift.name,
+      variantLabel: pick ? `${pick.option_group}: ${pick.label}` : null,
+      slug: gift.slug,
+      image: imageRes.data?.[0]?.url ?? null,
+      unitPrice: 0,
+      qty: 1,
+      lineTotal: 0,
+      maxQty: null,
+      free: true,
+    });
+    results.push({ ...base, status: "applied", remaining: 0 });
+  }
+  return results;
 }

@@ -1,3 +1,5 @@
+import { getTodayInIndia } from "@/lib/data/today";
+import { activeOffers } from "@/lib/offer";
 import type { Metadata } from "next";
 import { AnnouncementBar } from "@/components/site/announcement-bar";
 import { CartDrawer } from "@/components/site/cart-drawer";
@@ -9,7 +11,7 @@ import { renderTokensText } from "@/lib/content";
 import { getMenu } from "@/lib/data/menu";
 import { getSiteSettings } from "@/lib/data/settings";
 import { openGraphDefaults } from "@/lib/seo";
-import { settingBool, settingString } from "@/lib/settings";
+import { settingString } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -20,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
-  const [settings, menu] = await Promise.all([getSiteSettings(), getMenu()]);
+  const [settings, menu, today] = await Promise.all([getSiteSettings(), getMenu(), getTodayInIndia()]);
   // Empty-cart button points at the first menu head (NEW IN).
   const firstHead = menu[0];
 
@@ -41,7 +43,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       <FloatingWhatsApp settings={settings} />
       <CartDrawer
         cartMessage={renderTokensText(settingString(settings, "cart_message"), settings)}
-        offerText={settingBool(settings, "gift_offer_enabled") ? settingString(settings, "gift_offer_text") : ""}
+        offerTexts={activeOffers(settings, today).map((o) => o.text).filter(Boolean)}
         emptyCta={firstHead ? { label: firstHead.name, href: firstHead.href } : null}
       />
     </CartProvider>

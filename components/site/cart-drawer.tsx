@@ -13,12 +13,12 @@ import { useCart } from "./cart-provider";
 /** Slide-in cart. Empty and filled states mirror the reference layout. */
 export function CartDrawer({
   cartMessage,
-  offerText,
+  offerTexts,
   emptyCta,
 }: {
   cartMessage: string;
-  /** Free gift offer, when it's switched on (applied at checkout). */
-  offerText: string;
+  /** Wording of the free-gift offers running now (applied at checkout). */
+  offerTexts: string[];
   emptyCta: { label: string; href: string } | null;
 }) {
   const { items, subtotal, isOpen, close, setQty, remove } = useCart();
@@ -36,12 +36,12 @@ export function CartDrawer({
               <span>Subtotal</span>
               <span className="font-medium">{formatINR(subtotal)}</span>
             </div>
-            {offerText && (
-              <p className="flex items-start gap-2 rounded-md bg-butter/70 px-3 py-2 text-xs">
+            {offerTexts.map((text) => (
+              <p key={text} className="flex items-start gap-2 rounded-md bg-butter/70 px-3 py-2 text-xs">
                 <Gift className="mt-px size-4 shrink-0 text-chilli" aria-hidden />
-                <span>{offerText} — added at checkout.</span>
+                <span>{text} — added at checkout.</span>
               </p>
-            )}
+            ))}
             <p className="text-xs text-ink-muted">
               {cartMessage || "Shipping calculated at checkout."}
             </p>

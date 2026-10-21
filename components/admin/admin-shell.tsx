@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Gift,
   ClipboardList,
   ExternalLink,
   FileText,
@@ -23,6 +24,7 @@ const NAV: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: "/admin/orders", label: "Orders", Icon: ClipboardList },
   { href: "/admin/products", label: "Products", Icon: Package },
   { href: "/admin/homepage", label: "Homepage", Icon: LayoutTemplate },
+  { href: "/admin/offers", label: "Offers", Icon: Gift },
   { href: "/admin/categories", label: "Categories & Menu", Icon: ListTree },
   { href: "/admin/pages", label: "Pages & FAQs", Icon: FileText },
   { href: "/admin/settings", label: "Site Settings", Icon: Settings },

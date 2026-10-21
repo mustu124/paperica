@@ -121,11 +121,8 @@ insert into public.site_settings (key, value) values
   ('free_shipping_threshold_inr',     '1500'::jsonb),
   ('hero_rotation_ms',                '3000'::jsonb),
 
-  -- Free gift offer: buying this many products marked New adds the free product at checkout
-  ('gift_offer_enabled',              'true'::jsonb),
-  ('gift_offer_text',                 to_jsonb('Buy any 2 from the New Collection and get a set of Snap-in Separators free'::text)),
-  ('gift_offer_min_qty',              '2'::jsonb),
-  ('gift_offer_product_slug',         to_jsonb('snap-in-separators'::text)),
+  -- Free-gift offers (Admin → Offers): buy N from a scope, get a product free at checkout
+  ('offers',                          '[{"id": "launch-snap-in", "enabled": true, "scope": {"kind": "new"}, "min_qty": 2, "gift_product_id": null, "gift_slug": "snap-in-separators", "text": "Buy any 2 from the New Collection and get a set of Snap-in Separators free", "starts_on": null, "ends_on": null}]'::jsonb),
   ('cart_message',                    to_jsonb('Standard shipping of ₹{{standard_shipping_fee_inr}} per order is added at checkout.'::text)),
 
   -- Product page

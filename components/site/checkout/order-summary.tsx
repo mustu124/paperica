@@ -38,14 +38,16 @@ export function OrderSummary({ quote }: { quote: Quote }) {
         ))}
       </ul>
 
-      {quote.offer && quote.offer.status !== "applied" && (
-        <p role="status" className="rounded-md bg-butter/70 px-3 py-2 text-xs">
-          {quote.offer.status === "add_more"
-            ? `Add ${quote.offer.remaining} more from the New Collection to get your free gift.`
-            : "The free gift is out of stock right now, so it can't be added to this order."}
-          {quote.offer.text && <span className="block text-ink-muted">{quote.offer.text}</span>}
-        </p>
-      )}
+      {quote.offers
+        .filter((o) => o.status !== "applied")
+        .map((o) => (
+          <p key={o.id} role="status" className="rounded-md bg-butter/70 px-3 py-2 text-xs">
+            {o.status === "add_more"
+              ? `Add ${o.remaining} more to get your free gift.`
+              : "The free gift is out of stock right now, so it can't be added to this order."}
+            {o.text && <span className="block text-ink-muted">{o.text}</span>}
+          </p>
+        ))}
 
       <dl className="space-y-2 border-t border-taupe pt-4 text-sm">
         <div className="flex justify-between">

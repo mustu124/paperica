@@ -2,9 +2,11 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPublicClient } from "@/lib/supabase/public";
-import { countsTowardsOffer, giftOffer } from "@/lib/offer";
+import { activeOffers, countsTowards, offerTag } from "@/lib/offer";
 import type { ProductMode } from "@/types/db";
+import { getCategoryTree } from "./categories";
 import { getSiteSettings } from "./settings";
+import { getTodayInIndia } from "./today";
 import { TAGS } from "./tags";
 
 /** Lightweight product row used for listing, filtering and sorting (no images). */
@@ -135,8 +137,15 @@ export async function getProductCards(ids: string[]): Promise<ProductCardData[]>
   cacheTag(TAGS.products, TAGS.settings);
 
   if (ids.length === 0) return [];
-  const [{ products }, settings] = await Promise.all([getCatalog(), getSiteSettings()]);
-  const offer = giftOffer(settings);
+  const [{ products, placements }, settings, tree, today] = await Promise.all([getCatalog(), getSiteSettings(), getCategoryTree(), getTodayInIndia()]);
+  const offers = activeOffers(settings, today);
+  const categoryOf = new Map(tree.flatMap((c) => c.subcategories.map((s) => [s.id, c.id] as const)));
+  const offerFor = (r: ProductRow) => {
+    if (offers.length === 0) return null;
+    const subcategoryIds = placements.filter((pl) => pl.productId === r.id).map((pl) => pl.subcategoryId);
+    const p = { ...r, subcategoryIds, categoryIds: subcategoryIds.flatMap((s) => categoryOf.get(s) ?? []) };
+    return offers.find((o) => countsTowards(o, p)) ?? null;
+  };
   const byId = new Map(products.map((p) => [p.id, p]));
   const rows = ids.flatMap((id) => byId.get(id) ?? []);
 
@@ -169,7 +178,10 @@ export async function getProductCards(ids: string[]): Promise<ProductCardData[]>
       // If options couldn't be loaded, send shoppers to the product page rather than guess.
       hasOptions: withOptions.has(r.id) || Boolean(variantError),
       maxQty: r.stockQty,
-      offerTag: countsTowardsOffer(offer, r) && offer ? `Buy ${offer.minQty} · Free gift` : null,
+      offerTag: (() => {
+        const o = offerFor(r);
+        return o ? offerTag(o) : null;
+      })(),
     };
   });
 }
