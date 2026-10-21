@@ -35,7 +35,7 @@ On a phone, tap the **☰** button at the top left to see the menu.
 9. **Visibility:** leave **Active (visible in the shop)** on. Turn it off to hide the product without deleting it.
 10. Tap **Save product**. Use **Preview** to see it as a customer would.
 
-**Tip:** for a similar product, open an existing one and tap **Duplicate**. Then change the name, photos and price.
+**Delete:** open the product and tap **Delete**. It's removed from the shop straight away; past orders keep its name and price.
 
 ---
 
@@ -107,7 +107,7 @@ Each set lists what's inside under **Gift set contents**, for example "1 × Note
   2. Before marking the order **Dispatched**, reduce the stock of the exact designs you packed (Products → each item). Until then, the paid order holds those items back.
 - **Price:** the set's own price is what the customer pays. Put the "individual retail total" in **Compare-at price** to show the saving.
 - **Adding a new set:**
-  1. Duplicate an existing set and change the name, price, photos and contents.
+  1. Add a product with the set's name, price and photos, and fill in its **Gift set contents**.
   2. In **Categories & Menu** → GIFTS, add a subcategory with the set's name.
   3. Tap **Link or note…** and enter the set's page, for example `/products/the-little-things-set`.
   4. Tick that subcategory on the set's product.

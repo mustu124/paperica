@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowLeft, ArrowUp, Copy, ExternalLink, GripVertical, ImagePlus, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, GripVertical, ImagePlus, Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";
 import { RichText } from "@/components/admin/rich-text";
 import { Card, Field, inputCls, Toggle } from "@/components/admin/ui";
@@ -14,7 +14,7 @@ import { uploadImage } from "@/lib/admin/image";
 import { cn } from "@/lib/cn";
 import { slugify } from "@/lib/format";
 import type { SubcategoryKind } from "@/types/db";
-import { deleteProduct, duplicateProduct, saveProduct, type ProductInput } from "./actions";
+import { deleteProduct, saveProduct, type ProductInput } from "./actions";
 
 export type CategoryOption = {
   id: string;
@@ -125,36 +125,13 @@ export function ProductForm({
         </Link>
         {id && (
           <div className="flex flex-wrap gap-2">
-            <a
-              href={`/products/${v.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 min-h-11 rounded-md border border-ink/25 bg-white px-3 lg:min-h-0 lg:py-2 text-sm hover:border-chilli hover:text-chilli"
-            >
-              <ExternalLink className="size-4" aria-hidden /> Preview
-            </a>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() =>
-                run(() => duplicateProduct(id), "Copy created (inactive)").then(
-                  (r) => r.ok && r.data && router.push(`/admin/products/${(r.data as { id: string }).id}`),
-                )
-              }
-              className="inline-flex items-center gap-1.5 min-h-11 rounded-md border border-ink/25 bg-white px-3 lg:min-h-0 lg:py-2 text-sm hover:border-chilli hover:text-chilli"
-            >
-              <Copy className="size-4" aria-hidden /> Duplicate
-            </button>
             <button
               type="button"
               disabled={pending}
               onClick={() => {
-                if (!window.confirm(`Delete “${v.name}”? If it appears in past orders it will be deactivated instead.`)) return;
-                void run(() => deleteProduct(id), "Done", { refresh: false }).then((r) => {
-                  if (!r.ok) return;
-                  if ((r.data as { deactivated: boolean } | undefined)?.deactivated)
-                    toast("This product is in past orders, so it was deactivated instead of deleted.", "info");
-                  router.push("/admin/products");
+                if (!window.confirm(`Delete “${v.name}”? This can't be undone. Past orders keep its name and price.`)) return;
+                void run(() => deleteProduct(id), "Product deleted", { refresh: false }).then((r) => {
+                  if (r.ok) router.push("/admin/products");
                 });
               }}
               className="inline-flex items-center gap-1.5 min-h-11 rounded-md border border-chilli/40 bg-white px-3 lg:min-h-0 lg:py-2 text-sm text-chilli hover:bg-chilli hover:text-white"

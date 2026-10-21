@@ -199,60 +199,18 @@ export async function saveProduct(
 }
 
 /** Deletes a product — or, if it appears in past orders, only deactivates it. */
-export async function deleteProduct(id: string): Promise<ActionResult<{ deactivated: boolean }>> {
+/**
+ * Deletes a product. Past orders keep its name, price and photo (order_items copies them; the
+ * link to the product is cleared). Photo files are left in storage: past orders, the homepage
+ * or menus may still show them.
+ */
+export async function deleteProduct(id: string): Promise<ActionResult> {
   const admin = await requireAdmin();
   if (!admin) return NOT_AUTHORISED;
-  const { supabase } = admin;
-
-  const { data: used } = await supabase.from("order_items").select("id").eq("product_id", id).limit(1);
-  if (used && used.length > 0) {
-    const { error } = await supabase.from("products").update({ is_active: false }).eq("id", id);
-    if (error) return { ok: false, error: friendlyError(error) };
-    refreshCatalog();
-    return { ok: true, data: { deactivated: true } };
-  }
-
-  const { data: images } = await supabase.from("product_images").select("url").eq("product_id", id);
-  const { error } = await supabase.from("products").delete().eq("id", id);
+  const { error } = await admin.supabase.from("products").delete().eq("id", id);
   if (error) return { ok: false, error: friendlyError(error) };
-  await removeFiles(supabase, (images ?? []).map((i) => i.url));
   refreshCatalog();
-  return { ok: true, data: { deactivated: false } };
-}
-
-/** Copies a product (inactive, "(Copy)" name, new slug) with its images, options and categories. */
-export async function duplicateProduct(id: string): Promise<ActionResult<{ id: string }>> {
-  const admin = await requireAdmin();
-  if (!admin) return NOT_AUTHORISED;
-  const { supabase } = admin;
-
-  const { data: p } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
-  if (!p) return { ok: false, error: "Product not found." };
-  const suffix = Math.random().toString(36).slice(2, 6);
-  const { id: _id, created_at: _c, updated_at: _u, ...rest } = p;
-  void _id;
-  void _c;
-  void _u;
-  const { data: copy, error } = await supabase
-    .from("products")
-    .insert({ ...rest, name: `${p.name} (Copy)`, slug: `${p.slug}-copy-${suffix}`, sku: null, is_active: false })
-    .select("id")
-    .single();
-  if (error || !copy) return { ok: false, error: friendlyError(error) };
-
-  const [{ data: images }, { data: variants }, { data: links }, { data: bundle }] = await Promise.all([
-    supabase.from("product_images").select("url, alt, sort_order").eq("product_id", id),
-    supabase.from("product_variants").select("label, option_group, price_override, stock_qty, sort_order").eq("product_id", id),
-    supabase.from("product_subcategories").select("subcategory_id").eq("product_id", id),
-    supabase.from("product_bundle_items").select("subcategory_id, label, qty, sort_order").eq("bundle_id", id),
-  ]);
-  if (images?.length) await supabase.from("product_images").insert(images.map((i) => ({ ...i, product_id: copy.id })));
-  if (variants?.length) await supabase.from("product_variants").insert(variants.map((x) => ({ ...x, product_id: copy.id })));
-  if (links?.length) await supabase.from("product_subcategories").insert(links.map((l) => ({ ...l, product_id: copy.id })));
-  if (bundle?.length) await supabase.from("product_bundle_items").insert(bundle.map((b) => ({ ...b, bundle_id: copy.id })));
-
-  refreshCatalog();
-  return { ok: true, data: { id: copy.id } };
+  return { ok: true };
 }
 
 const bulkPatch = z
