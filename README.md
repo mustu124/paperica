@@ -51,7 +51,7 @@ Generated from `brand/Paperica logo (3).png` (transparent) and `brand/Paperica l
 
 The logos and preview image are site settings, so the owner can replace them in
 Admin → Site Settings → Branding & sharing (uploads go to the `branding/` folder of the media bucket).
-**Look & fonts:** pink header and announcement in chilli, cream page, pastel collection tiles, white rounded product cards and pill buttons (tokens in `app/globals.css`). Headings use Libre Caslon Condensed (SIL OFL, self-hosted in `app/fonts/`), hero headlines Fraunces with Sacramento for `*starred*` words, body Jost.
+**Look & fonts:** pink header and announcement in chilli, cream page, pastel collection tiles, white rounded product cards and pill buttons (tokens in `app/globals.css`). Headings use Libre Caslon Condensed (SIL OFL, self-hosted in `app/fonts/`), hero headlines Fraunces, Trajan-style accents (Cinzel, a free Trajan-like face) for `*starred*` words, the About signature and note titles, body Jost.
 
 Pages that set their own `openGraph` spread in `shareImages()` from `lib/seo.ts`, because Next.js
 replaces (doesn't merge) a parent's `openGraph`.

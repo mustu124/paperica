@@ -50,7 +50,7 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
     aspect: "aspect-[12/5]",
     mobileAspect: "aspect-[9/16]",
     fields: [
-      { key: "heading", label: "Heading (optional)", hint: "Wrap words in *stars* for the handwritten script, e.g. A little paper happiness for your *everyday life.*" },
+      { key: "heading", label: "Heading (optional)", hint: "Wrap words in *stars* for the Trajan-style capitals, e.g. A little paper happiness for your *everyday life.*" },
       { key: "subheading", label: "Short line (optional)" },
       { key: "button_label", label: "Button label (optional)", hint: "e.g. Shop now. Leave empty to make the whole banner the link." },
       { key: "link_url", label: "Link", link: true },
@@ -61,8 +61,8 @@ export const SECTION_SPECS: Record<HomepageSectionType, SectionSpec> = {
         label: "Heading style",
         type: "select",
         options: [
-          { value: "playful", label: "Soft serif + script (default)" },
-          { value: "script", label: "Script (handwritten)" },
+          { value: "playful", label: "Soft serif + Trajan-style accents (default)" },
+          { value: "script", label: "Trajan-style capitals" },
           { value: "serif", label: "Condensed serif" },
           { value: "display", label: "Logo style" },
         ],

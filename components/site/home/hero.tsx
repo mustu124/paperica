@@ -13,17 +13,17 @@ import { configString, groupSlots } from "./slots";
 
 const HEADING_FONT: Record<string, string> = {
   playful: "font-headline font-semibold text-4xl leading-[1.05] md:text-5xl lg:text-6xl",
-  script: "font-script text-5xl leading-none md:text-7xl",
+  script: "font-script font-bold text-4xl leading-tight tracking-wide md:text-6xl",
   serif: "font-serif font-bold text-4xl leading-tight md:text-6xl",
   display: "font-display text-4xl md:text-5xl",
 };
 
-/** "A little paper happiness for your *everyday life.*" → *…* parts in the handwritten script. */
+/** "A little paper happiness for your *everyday life.*" → *…* parts in the Trajan-style capitals. */
 function Headline({ text }: { text: string }) {
   const parts = text.split(/(\*[^*]+\*)/g).filter(Boolean);
   return parts.map((part, i) =>
     part.startsWith("*") && part.endsWith("*") ? (
-      <span key={i} className="font-script text-[1.35em] font-normal leading-[0.8]">
+      <span key={i} className="font-script font-bold tracking-wide">
         {part.slice(1, -1)}
       </span>
     ) : (

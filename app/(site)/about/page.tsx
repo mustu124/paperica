@@ -34,7 +34,7 @@ function NoteCard({ title, html, tone, tilt, doodle }: { title: string; html: st
     <section className={cn("relative rounded-[2rem] px-6 pb-8 pt-10 shadow-[0_10px_30px_-12px_rgb(139_0_0/0.25)] md:px-9", tone, tilt)}>
       {/* tape */}
       <span aria-hidden className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rotate-[-4deg] rounded-sm bg-white/70 shadow-sm" />
-      <h2 className="flex items-center gap-2 font-script text-5xl leading-none text-chilli md:text-6xl">
+      <h2 className="flex items-center gap-2 font-script text-3xl font-bold leading-none tracking-wide text-chilli md:text-4xl">
         {title}
         {doodle}
       </h2>
@@ -70,8 +70,8 @@ export default async function AboutPage() {
             <p className="label-caps inline-block border-b-2 border-chilli pb-1 text-chilli">About us</p>
             <h1 className="mt-5 font-headline text-4xl font-semibold leading-[1.05] text-chilli md:text-6xl">{title}</h1>
             {intro && <Prose html={intro} className="mx-auto mt-6 max-w-xl text-lg italic text-ink/85 md:text-xl" />}
-            <p className="mt-8 font-script text-6xl leading-none text-chilli md:text-7xl" aria-label={`— ${brand}`}>
-              {brand} <DoodleHeart className="size-8 -translate-y-2 text-chilli" />
+            <p className="mt-8 font-script text-4xl font-bold leading-none tracking-[0.08em] text-chilli md:text-5xl" aria-label={`— ${brand}`}>
+              {brand} <DoodleHeart className="size-7 -translate-y-1 text-chilli" />
             </p>
           </div>
 

@@ -40,7 +40,7 @@
   --font-display: var(--font-marcellus-sc), ui-serif, Georgia, serif; /* wordmark-style titles */
   --font-serif: var(--font-caslon), ui-serif, Georgia, serif;         /* section headings */
   --font-headline: var(--font-fraunces), ui-serif, Georgia, serif;    /* hero headlines */
-  --font-script: var(--font-sacramento), cursive;                      /* handwritten accents */
+  --font-script: var(--font-cinzel), "Trajan Pro", ui-serif, serif;    /* Trajan-style accents */
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif; /* body + UI */
 }
 

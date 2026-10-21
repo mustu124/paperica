@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Jost, Marcellus_SC, Sacramento } from "next/font/google";
+import { Cinzel, Fraunces, Jost, Marcellus_SC } from "next/font/google";
 import localFont from "next/font/local";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
@@ -21,16 +21,17 @@ const serif = localFont({
   display: "swap",
 });
 
-// Soft serif for big hero headlines, and a handwritten script for *emphasised* words.
+// Soft serif for big hero headlines, and Trajan-style Roman capitals (Cinzel, a free
+// Trajan-like face) for accents: *emphasised* words, the About signature and note titles.
 const headline = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   weight: ["500", "600"],
 });
-const script = Sacramento({
-  variable: "--font-sacramento",
+const script = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "700"],
 });
 
 // Geometric sans for body copy, UI and wide-tracked labels.
