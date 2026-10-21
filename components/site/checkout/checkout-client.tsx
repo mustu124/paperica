@@ -30,6 +30,7 @@ type Payment = {
   amount: number;
   currency: string;
   orderNumber: string;
+  token: string;
   prefill: { name: string; email: string; contact: string };
 };
 
@@ -177,7 +178,7 @@ export function CheckoutClient({ copy }: { copy: CheckoutCopy }) {
           prefill: p.prefill,
           notes: { order_number: p.orderNumber },
           theme: { color: BRAND_COLOUR },
-          handler: (res) => void verify(res),
+          handler: (res) => void verify(res, p),
           modal: { ondismiss: () => setStatus((s) => (s.kind === "working" ? { kind: "cancelled" } : s)) },
         },
         (message) => setStatus({ kind: "failed", message }),
@@ -187,7 +188,7 @@ export function CheckoutClient({ copy }: { copy: CheckoutCopy }) {
     }
   };
 
-  const verify = async (res: RazorpaySuccess) => {
+  const verify = async (res: RazorpaySuccess, p: Payment) => {
     setStatus({ kind: "working", message: "Confirming your payment…" });
     try {
       const r = await fetch("/api/checkout/verify", {
@@ -200,13 +201,11 @@ export function CheckoutClient({ copy }: { copy: CheckoutCopy }) {
       if (!buyNow) clearCart();
       window.scrollTo({ top: 0 }); // land on the "Thank you" heading, not mid-page
       router.replace(`/order-confirmation/${data.orderNumber}?t=${data.token}`);
-    } catch (e) {
-      setStatus({
-        kind: "error",
-        message:
-          (e as Error).message ||
-          "We couldn't confirm your payment automatically. If money was deducted, your order will be confirmed shortly — please contact us with your order number.",
-      });
+    } catch {
+      // Couldn't confirm here (e.g. back from a UPI app with a flaky connection): the order page
+      // keeps checking with Razorpay and shows "paid" as soon as Razorpay has the payment.
+      window.scrollTo({ top: 0 });
+      router.replace(`/order-confirmation/${p.orderNumber}?t=${p.token}`);
     }
   };
 

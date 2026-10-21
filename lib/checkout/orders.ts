@@ -14,7 +14,12 @@ export async function markOrderPaid(orderId: string, paymentId: string | null) {
   const { data, error } = await supabase.rpc("mark_order_paid", { p_order_id: orderId, p_payment_id: paymentId });
   if (error) throw new Error(`mark_order_paid failed: ${error.message}`);
   if (data === true) {
-    refreshTagsInBackground("products");
+    try {
+      refreshTagsInBackground("products");
+    } catch {
+      // Not allowed while a page renders (order page / admin reconciling with Razorpay):
+      // stock counts then refresh within a minute on their own.
+    }
     await onOrderPaid(orderId);
   }
   return data === true;

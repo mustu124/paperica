@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       shipping_inr: quote.shipping,
       total_inr: quote.total,
     })
-    .select("id, order_number")
+    .select("id, order_number, access_token")
     .single();
   if (orderError || !order) {
     console.error("[checkout/create] order insert failed:", orderError?.message);
@@ -113,6 +113,8 @@ export async function POST(request: NextRequest) {
     amount: rupeesToPaise(quote.total),
     currency: "INR",
     orderNumber: order.order_number,
+    // Private link to this order's page, for the buyer only (used if the browser can't confirm the payment).
+    token: order.access_token,
     prefill: { name: customer.name, email: customer.email, contact: `+91${customer.phone}` },
   });
 }

@@ -1,3 +1,4 @@
+import { reconcileRecentPending } from "@/lib/checkout/reconcile";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Download, Search } from "lucide-react";
@@ -43,6 +44,9 @@ async function Orders({ searchParams }: Pick<Props, "searchParams">) {
   const page = Math.max(1, Number(Array.isArray(raw.page) ? raw.page[0] : raw.page) || 1);
   const admin = await requireAdmin();
   if (!admin) return null;
+
+  // Catch payments Razorpay took but the site never heard about (browser closed, webhook missing).
+  await reconcileRecentPending();
 
   let query = admin.supabase
     .from("orders")

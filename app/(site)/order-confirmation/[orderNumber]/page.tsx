@@ -11,6 +11,7 @@ import { renderTokensText } from "@/lib/content";
 import { getSiteSettings } from "@/lib/data/settings";
 import { formatDate, formatINR } from "@/lib/format";
 import { settingString } from "@/lib/settings";
+import { reconcileOrder } from "@/lib/checkout/reconcile";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatWhatsAppDisplay, whatsappUrl } from "@/lib/whatsapp";
 
@@ -81,6 +82,9 @@ async function Confirmation({ params, searchParams }: Props) {
       </div>
     );
   }
+
+  // Paid in a UPI app but the browser never confirmed it? Ask Razorpay.
+  if (order.payment_status === "pending" && (await reconcileOrder(order)) === "paid") order.payment_status = "paid";
 
   const { data: items } = await supabase.from("order_items").select("*").eq("order_id", order.id);
   const paid = order.payment_status === "paid";

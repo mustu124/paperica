@@ -1,3 +1,4 @@
+import { reconcileOrder } from "@/lib/checkout/reconcile";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,6 +38,9 @@ async function OrderDetail({ params }: Props) {
     admin.supabase.from("site_settings").select("value").eq("key", "whatsapp_tracking_template").maybeSingle(),
   ]);
   if (!order) notFound();
+  if ((order.payment_status === "pending" || order.payment_status === "failed") && (await reconcileOrder(order)) === "paid") {
+    order.payment_status = "paid";
+  }
   // Gift sets in this order (designs are chosen on WhatsApp, so component stock is reduced by hand).
   const productIds = (items ?? []).flatMap((it) => (it.product_id ? [it.product_id] : []));
   const { data: bundleRows } = productIds.length
